@@ -1,17 +1,22 @@
 # frozen_string_literal: true
 
+require_relative('./train')
+
 class Station
-  attr_reader :name
-  attr_accessor :trains
+  attr_reader :name, :trains
 
   def initialize(name)
     @name = name
-    @trains = []
+    @trains = {}
+  end
+
+  def trains=(train)
+    @trains.store(train.number, train)
   end
 
   def types_of_trains; end
 
-  def delete_train(train_number)
-    @trains.delete(train_number)
+  def delete_train(train)
+    @trains.delete(train.name)
   end
 end
