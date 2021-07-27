@@ -16,7 +16,7 @@ months_and_days =
     'December' => 31
   }
 
-months_and_days.each { |key, value| p "#{key} - has #{value} days" if value == 30 }
+months_and_days.each { |month, days| p "#{month} - has #{days} days" if days == 30 }
 
 # ===
 
