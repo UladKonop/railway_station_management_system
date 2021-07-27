@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
+require_relative('./route')
+
 class Train
-  attr_reader :number, :type
+  attr_reader :number, :type, :route
   # cargo, passenger
-  attr_accessor :speed, :route
+  attr_accessor :speed
 
   def initialize(name, type, wagons_amount)
     @name = name
@@ -22,6 +24,14 @@ class Train
     else
       p 'Please, stop the train first!'
     end
+  end
+
+  def wagons_amount
+    @wagons_amount
+  end
+
+  def route=(route)
+    @routes = {route.name => route}
   end
 
   def go(direction); end
