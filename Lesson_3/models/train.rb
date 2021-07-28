@@ -27,8 +27,39 @@ class Train
       p 'Please, stop the train first!'
     end
   end
+
   def route=(route)
-    @route = route
-    @route.first.trains = self
+    @route = route.clone
+    @route.first.last.trains = self
+  end
+
+  def nearest_stations
+    index = 0
+
+    @route.each_value { |station| index += 1 if @number == station.trains[@number]&.number }
+
+    current_index = index - 1
+    previos_index = current_index - 1
+    next_index = current_index + 1
+
+    route_array = @route.to_a
+
+    if previos_index.negative?
+      {
+        current_station: route_array[current_index].first,
+        next_station: route_array[next_index].first
+      }
+    elsif next_index > @route.size
+      {
+        previos_station: route_array[previos_index].first,
+        current_station: route_array[current_index].first
+      }
+    else
+      {
+        previos_station: route_array[previos_index].first,
+        current_station: route_array[current_index].first,
+        next_station: route_array[next_index].first
+      }
+    end
   end
 end
