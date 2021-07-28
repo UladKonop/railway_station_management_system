@@ -3,12 +3,14 @@
 require_relative('./route')
 
 class Train
-  attr_reader :number, :type, :route
-  # cargo, passenger
-  attr_accessor :speed
+  attr_reader :number, :type, :wagons_amount, :route
 
-  def initialize(name, type, wagons_amount)
-    @name = name
+  attr_accessor :speed, :current_station
+
+  def initialize(number, type, wagons_amount)
+    return nil unless (type == :cargo) || (type == :passenger)
+
+    @number = number
     @type = type
     @wagons_amount = wagons_amount
     @speed = 0
@@ -25,14 +27,8 @@ class Train
       p 'Please, stop the train first!'
     end
   end
-
-  def wagons_amount
-    @wagons_amount
-  end
-
   def route=(route)
-    @routes = {route.name => route}
+    @route = route
+    @route.first.trains = self
   end
-
-  def go(direction); end
 end
