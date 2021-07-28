@@ -9,7 +9,7 @@ class Route
     @starting_station = starting_station
     @end_station = end_station
     @intermediate_stations = {}
-    @full_route = []
+    @full_route = {}
     make_full_route
   end
 
@@ -22,9 +22,12 @@ class Route
   end
 
   def make_full_route
-    @full_route.push(@starting_station)
-    @full_route.push(@intermediate_stations.to_a)
-    @full_route.push(@end_station)
-    @full_route.flatten!.compact!
+    @full_route = {}
+    @full_route.store(@starting_station.name, @starting_station)
+    @intermediate_stations.each do |intermediate_station|
+      @full_route.store(intermediate_station.first, intermediate_station.last)
+    end
+    @full_route.store(@end_station.name, @end_station)
+    # @full_route = @full_route.flatten.compact
   end
 end
