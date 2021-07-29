@@ -33,44 +33,42 @@ class Train
     @route.first.trains = self
   end
 
-  def nearest_stations
-    index = 0
-    current_index = 0
+  def current_station
     @route.each do |station|
-      current_index = index if @number == station.trains[@number]&.number
-      index += 1
+      return station if @number == station.trains[@number]&.number
     end
-    previous_index = current_index - 1
-    next_index = current_index + 1
+  end
 
-    route_array = @route
+  def next_station
+    @route.each_with_index do |station, index|
+      if station == current_station
+        if @route[index + 1]
+          return @route[index + 1]
+        else
+          p 'The next station does not exist'
+        end
+      end
+    end
+  end
 
-    if previous_index.negative?
-      {
-        current_station: route_array[current_index],
-        next_station: route_array[next_index]
-      }
-    elsif next_index == @route.size
-      {
-        previous_station: route_array[previous_index],
-        current_station: route_array[current_index]
-      }
-    else
-      {
-        previous_station: route_array[previous_index],
-        current_station: route_array[current_index],
-        next_station: route_array[next_index]
-      }
+  def previous_station
+    @route.each_with_index do |station, index|
+      if station == current_station
+        if @route[index - 1]
+          return @route[index - 1]
+        else
+          p 'The previous station does not exist'
+        end
+      end
     end
   end
 
   def move(direction)
-    near_stations = nearest_stations
     case direction
     when :forward
-      near_stations[:next_station] ? move_train_forward : 'The train is already at the final station!'
+      next_station.instance_of?(Station) ? move_train_forward : 'The train is already at the final station!'
     when :backwards
-      near_stations[:previous_station] ? move_train_backwards : 'The train is already at the first station!'
+      previous_station.instance_of?(Station) ? move_train_backwards : 'The train is already at the first station!'
     else
       p 'Train can only move :forward and :backwards!'
     end
