@@ -25,9 +25,6 @@ route.intermediate_stations = fourth_station
 route.delete_intermediate_station(third_station)
 # p route.intermediate_stations
 
-route.make_full_route
-# p route.full_route
-
 train = Train.new('aa111', :cargo, 33)
 # p train
 # p train.number
@@ -50,17 +47,11 @@ train2 = Train.new('b22', :passenger, 3)
 # p train2
 starting_station.trains = train
 starting_station.trains = train2
-# p starting_station.trains
-# p starting_station.trains_types
-
-starting_station.send_train(train, second_station)
-# p starting_station.trains_types
-# p second_station.trains_types
 
 starting_station.delete_train(train2)
 second_station.delete_train(train)
 
-train.route = route.full_route
+train.route = route.make_full_route
 # p train.route
 
 # p train.nearest_stations[:current_station]
@@ -68,9 +59,9 @@ train.route = route.full_route
 
 train.move(:forward)
 train.move(:forward)
-
-train.route.each_value do |station|
-  p station.name if train.number == station.trains[train.number]&.number
-end
-
-# p train.nearest_stations
+train.move(:forward)
+# p train.move(:forward)
+train.move(:backwards)
+p train.current_station
+# p train.next_station
+# p train.previous_station
