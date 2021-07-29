@@ -29,37 +29,37 @@ class Train
   end
 
   def route=(route)
-    @route = route.clone
-    @route.first.last.trains = self
+    @route = route
+    @route.first.trains = self
   end
 
   def nearest_stations
     index = 0
     current_index = 0
-    @route.each_value do |station|
+    @route.each do |station|
       current_index = index if @number == station.trains[@number]&.number
       index += 1
     end
     previous_index = current_index - 1
     next_index = current_index + 1
 
-    route_array = @route.to_a
+    route_array = @route
 
     if previous_index.negative?
       {
-        current_station: route_array[current_index].first,
-        next_station: route_array[next_index].first
+        current_station: route_array[current_index],
+        next_station: route_array[next_index]
       }
     elsif next_index == @route.size
       {
-        previous_station: route_array[previous_index].first,
-        current_station: route_array[current_index].first
+        previous_station: route_array[previous_index],
+        current_station: route_array[current_index]
       }
     else
       {
-        previous_station: route_array[previous_index].first,
-        current_station: route_array[current_index].first,
-        next_station: route_array[next_index].first
+        previous_station: route_array[previous_index],
+        current_station: route_array[current_index],
+        next_station: route_array[next_index]
       }
     end
   end
@@ -68,25 +68,36 @@ class Train
     near_stations = nearest_stations
     case direction
     when :forward
-      if near_stations[:next_station]
-        @route.each_value do |station|
-          @route[station.name].trains.delete(@number) if @number == station.trains[@number]&.number
-        end
-        @route[near_stations[:next_station]].trains.store(@number, self)
-      else
-        p 'The train is already at the final station!'
-      end
+      near_stations[:next_station] ? move_train_forward : 'The train is already at the final station!'
     when :backwards
-      if near_stations[:previous_station]
-        @route.each_value do |station|
-          station.trains.delete(@number) if @number == station.trains[@number]&.number
-        end
-        @route[near_stations[:previous_station]].trains.store(@number, self)
-      else
-        p 'The train is already at the first station!'
-      end
+      near_stations[:previous_station] ? move_train_backwards : 'The train is already at the first station!'
     else
       p 'Train can only move :forward and :backwards!'
     end
   end
+
+  private
+
+  def move_train_forward
+    next_station_index = 0
+    @route.each_with_index do |station, index|
+      if @number == station.trains[@number]&.number
+        @route[index].trains.delete(@number)
+        next_station_index = index + 1
+      end
+    end
+    @route[next_station_index].trains.store(@number, self)
+  end
+
+  def move_train_backwards
+    previous_station_index = 0
+    @route.each_with_index do |station, index|
+      if @number == station.trains[@number]&.number
+        @route[index].trains.delete(@number)
+        previous_station_index = index - 1
+      end
+    end
+    @route[previous_station_index].trains.store(@number, self)
+  end
+
 end
