@@ -18,21 +18,7 @@ class Station
     @trains.delete(train.number)
   end
 
-  def trains_types
-    cargos = 0
-    passengers = 0
-    @trains.each_value do |train|
-      if train.type == :cargo
-        cargos += 1
-      else
-        passengers += 1
-      end
-    end
-    { cargos: cargos, passengers: passengers }
-  end
-
-  def send_train(train, station)
-    delete_train(train)
-    station.trains = train
+  def trains_by_type(type)
+    @trains.select { |_number, train| train.type == type }.to_a
   end
 end
