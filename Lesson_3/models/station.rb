@@ -7,18 +7,18 @@ class Station
 
   def initialize(name)
     @name = name
-    @trains = {}
+    @trains = []
   end
 
   def trains=(train)
-    @trains.store(train.number, train)
+    @trains << train
   end
 
   def delete_train(train)
-    @trains.delete(train.number)
+    @trains.delete(train)
   end
 
   def trains_by_type(type)
-    @trains.select { |_number, train| train.type == type }.to_a
+    @trains.select { |train| train.type == type }
   end
 end
