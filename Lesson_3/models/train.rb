@@ -35,6 +35,7 @@ class Train
 
   def current_station
     @route.each do |station|
+      binding.irb
       return station if @number == station.trains[@number]&.number
     end
   end
@@ -66,9 +67,9 @@ class Train
   def move(direction)
     case direction
     when :forward
-      next_station.instance_of?(Station) ? move_train_forward : 'The train is already at the final station!'
+      next_station ? move_train_forward : 'The train is already at the final station!'
     when :backwards
-      previous_station.instance_of?(Station) ? move_train_backwards : 'The train is already at the first station!'
+      previous_station ? move_train_backwards : 'The train is already at the first station!'
     else
       p 'Train can only move :forward and :backwards!'
     end
