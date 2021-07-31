@@ -21,10 +21,12 @@ class Route
 
   def make_full_route
     full_route = []
+    # binding.irb
     full_route << @starting_station
     @intermediate_stations.each do |intermediate_station|
       full_route << intermediate_station
     end
     full_route << @end_station
+    full_route
   end
 end
