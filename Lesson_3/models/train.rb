@@ -3,9 +3,9 @@
 require_relative('./route')
 
 class Train
-  attr_reader :number, :type, :wagons_amount, :route
+  attr_reader :number, :type, :wagons_amount
 
-  attr_accessor :speed
+  attr_accessor :speed, :route
 
   def initialize(number, type, wagons_amount)
     return nil unless (type == :cargo) || (type == :passenger)
@@ -28,40 +28,35 @@ class Train
     end
   end
 
-  def route=(route)
-    @route = route
-    @route.first.trains = self
-  end
-
   def current_station
     @route.each do |station|
-      binding.irb
-      return station if @number == station.trains[@number]&.number
+      return station if self == station.trains.select { |train| train.number == @number }.pop
+        
+      
     end
+    nil
   end
 
   def next_station
     @route.each_with_index do |station, index|
-      if station == current_station
-        if @route[index + 1]
-          return @route[index + 1]
-        else
-          p 'The next station does not exist'
+      if station == current_station 
+        unless (@route[index + 1]).nil?
+        return @route[index + 1] 
         end
       end
     end
+    false
   end
 
   def previous_station
     @route.each_with_index do |station, index|
-      if station == current_station
-        if @route[index - 1]
-          return @route[index - 1]
-        else
-          p 'The previous station does not exist'
+      if station == current_station 
+        unless (@route[index - 1]).nil?
+        return @route[index - 1] 
         end
       end
     end
+    false
   end
 
   def move(direction)
@@ -69,6 +64,7 @@ class Train
     when :forward
       next_station ? move_train_forward : 'The train is already at the final station!'
     when :backwards
+      binding.irb
       previous_station ? move_train_backwards : 'The train is already at the first station!'
     else
       p 'Train can only move :forward and :backwards!'
@@ -78,25 +74,13 @@ class Train
   private
 
   def move_train_forward
-    next_station_index = 0
-    @route.each_with_index do |station, index|
-      if @number == station.trains[@number]&.number
-        @route[index].trains.delete(@number)
-        next_station_index = index + 1
-      end
-    end
-    @route[next_station_index].trains.store(@number, self)
+    next_station.trains << self
+    current_station.trains.delete(self)
   end
 
   def move_train_backwards
-    previous_station_index = 0
-    @route.each_with_index do |station, index|
-      if @number == station.trains[@number]&.number
-        @route[index].trains.delete(@number)
-        previous_station_index = index - 1
-      end
-    end
-    @route[previous_station_index].trains.store(@number, self)
+    binding.irb
+    previous_station.trains << self
+    current_station.trains.delete(self)
   end
-
 end
