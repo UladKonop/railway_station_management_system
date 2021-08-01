@@ -20,9 +20,9 @@ route = Route.new(starting_station, end_station)
 
 route.intermediate_stations = second_station
 route.intermediate_stations = third_station
-route.intermediate_stations = fourth_station
+# route.intermediate_stations = fourth_station
 # p route.intermediate_stations
-route.delete_intermediate_station(third_station)
+# route.delete_intermediate_station(third_station)
 # p route.intermediate_stations
 
 train = Train.new('aa111', :cargo, 33)
@@ -43,25 +43,27 @@ train.stop
 train.change_wagon_amount(-1)
 # p train.wagons_amount
 
-train2 = Train.new('b22', :passenger, 3)
-# p train2
-starting_station.trains = train
-starting_station.trains = train2
-
-starting_station.delete_train(train2)
-second_station.delete_train(train)
 
 train.route = route.make_full_route
 # p train.route
 
-# p train.nearest_stations[:current_station]
-# p train.nearest_stations
-
-train.move(:forward)
-train.move(:forward)
-train.move(:forward)
-# p train.move(:forward)
-train.move(:backwards)
 p train.current_station
 # p train.next_station
+p '========'
+# binding.irb
+# p train.move(:forward)
+# p '========'
+train.move(:forward)
+# p train.current_station
+# p train.next_station
+# train.move(:forward)
+# train.move(:forward)
+# train.move(:backwards)
+# train.move(:backwards)
+train.move(:backwards)
+p '========'
 # p train.previous_station
+
+p train.current_station
+# p train.next_station
+# binding.irb
