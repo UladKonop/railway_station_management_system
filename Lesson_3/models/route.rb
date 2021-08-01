@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative('./station')
-
 class Route
   attr_reader :starting_station, :end_station, :intermediate_stations, :full_route
 
@@ -21,7 +19,6 @@ class Route
 
   def make_full_route
     full_route = []
-    # binding.irb
     full_route << @starting_station
     @intermediate_stations.each do |intermediate_station|
       full_route << intermediate_station
