@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative('./train')
-
 class Station
   attr_reader :name, :trains
 
