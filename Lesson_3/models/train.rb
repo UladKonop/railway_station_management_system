@@ -9,8 +9,6 @@ class Train
   attr_accessor :speed
 
   def initialize(number, type, wagons_amount)
-    return nil unless (type == :cargo) || (type == :passenger)
-
     @number = number
     @type = type
     @wagons_amount = wagons_amount
