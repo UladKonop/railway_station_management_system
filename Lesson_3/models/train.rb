@@ -40,19 +40,11 @@ class Train
   end
 
   def next_station
-    @route.each_with_index do |station, index|
-      next unless station == current_station
-      return @route[index + 1] if index + 1 < @route.size
-    end
-    false
+    @route[@route.index(current_station) + 1] if current_station != @route.last
   end
 
   def previous_station
-    @route.each_with_index do |station, index|
-      next unless station == current_station
-      return @route[index - 1] if index - 1 >= 0
-    end
-    false
+    @route[@route.index(current_station) - 1] if current_station != @route.first
   end
 
   def move(direction)
