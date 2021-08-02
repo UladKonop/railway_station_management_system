@@ -33,8 +33,8 @@ class Train
   end
 
   def current_station
-    @route.each do |station|
-      return station if self == station.trains.select { |train| train.number == @number }.pop
+    @route.find do |station|
+      return station if station.trains.include?(self)
     end
     nil
   end
