@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Route
-  attr_reader :starting_station, :end_station, :intermediate_stations, :full_route
+  attr_reader :starting_station, :end_station, :intermediate_stations
 
   def initialize(starting_station, end_station)
     @starting_station = starting_station
@@ -17,13 +17,13 @@ class Route
     @intermediate_stations.delete(station)
   end
 
-  def make_full_route
-    full_route = []
-    full_route << @starting_station
+  def stations
+    stations = []
+    stations << @starting_station
     @intermediate_stations.each do |intermediate_station|
-      full_route << intermediate_station
+      stations << intermediate_station
     end
-    full_route << @end_station
-    full_route
+    stations << @end_station
+    stations
   end
 end
