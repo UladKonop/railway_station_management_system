@@ -29,22 +29,22 @@ class Train
 
   def route=(route)
     @route = route
-    @route.first.trains << self
+    @route.stations.first.trains << self
   end
 
   def current_station
-    @route.find do |station|
+    @route.stations.find do |station|
       return station if station.trains.include?(self)
     end
     nil
   end
 
   def next_station
-    @route[@route.index(current_station) + 1] if current_station != @route.last
+    @route.stations[@route.stations.index(current_station) + 1] if current_station != @route.stations.last
   end
 
   def previous_station
-    @route[@route.index(current_station) - 1] if current_station != @route.first
+    @route.stations[@route.stations.index(current_station) - 1] if current_station != @route.stations.first
   end
 
   def move(direction)
