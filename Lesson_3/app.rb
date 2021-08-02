@@ -44,10 +44,11 @@ train.change_wagon_amount(-1)
 # p train.wagons_amount
 
 
-train.route = route.make_full_route
+train.route = route
 # p train.route
 
 p train.current_station
+# binding.irb
 # p train.next_station
 p '========'
 # binding.irb
