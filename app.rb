@@ -3,7 +3,6 @@
 require 'tty-prompt'
 
 require_relative('./models/route')
-require_relative('./models/train')
 require_relative('./models/station')
 require_relative('./models/cargo_train')
 require_relative('./models/cargo_wagon')
@@ -95,6 +94,12 @@ def show_route
   end
 end
 
+def create_trains_menu
+  train_numbers = []
+  @trains.each { |train| train_numbers << train.number}
+  train_numbers
+end
+
 def create_stations_menu
   station_names = []
   @stations.each { |station| station_names << station.name }
@@ -136,13 +141,26 @@ def create_train
   end
 end
 
+def find_train(train_number)
+  @trains.find { |train| train if train.number == train_number }
+end
+
+def assign_route
+  if @route.nil?
+    p 'Create route first'
+  else
+    train = @prompt.select('Select train to assign Route: ', create_trains_menu)
+    find_train(train).route = @route
+  end
+end
+
 def make_choice
   @prompt.select('Select an action: ', per_page: 9) do |menu|
     menu.choice 'Create station', 1
     menu.choice 'Create train', 2
     menu.choice 'Create route', 3
     menu.choice 'Add intermediate stations to route', 4
-    menu.choice 'Assign a train route', 5, disabled: ''
+    menu.choice 'Assign a train route', 5
     menu.choice 'Manipulations with wagons', 6, disabled: ''
     menu.choice 'Move train', 7, disabled: ''
     menu.choice 'Show route and trains', 8
@@ -158,10 +176,13 @@ loop do
     create_station
   when 2
     create_train
+    p @trains
   when 3
     create_route
   when 4
     add_intermediate_stations
+  when 5
+    assign_route
   when 8
     show_route
   when 9
