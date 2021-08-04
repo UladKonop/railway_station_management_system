@@ -11,6 +11,7 @@ class Train
   def initialize(number)
     @number = number
     @speed = 0
+    @wagons = []
   end
 
   def stop
@@ -19,11 +20,15 @@ class Train
 
   def add_wagon(wagon)
     if @speed.zero?
-      if wagon.type == @type
         self.wagons = wagon
-      else
-        p 'Please, choose another type of wagon!'
-      end
+    else
+      p 'Please, stop the train first!'
+    end
+  end
+
+  def delete_wagon(wagon)
+    if @speed.zero?
+        self.wagons.delete_at(self.wagons.index(wagon))
     else
       p 'Please, stop the train first!'
     end
