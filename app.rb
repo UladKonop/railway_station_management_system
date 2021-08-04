@@ -8,18 +8,6 @@ require_relative('./models/cargo_train')
 require_relative('./models/cargo_wagon')
 require_relative('./models/passenger_train')
 require_relative('./models/passenger_wagon')
-# require_relative('./models/wagon')
-
-# # p train.wagons_amount
-# train.change_wagon_amount(-1)
-# # p train.wagons_amount
-# # p train.speed
-
-
-# # train.change_wagon_amount(-1)
-
-# train.change_wagon_amount(-1)
-# # p train.wagons_amount
 
 @stations = []
 @trains = []
@@ -147,6 +135,38 @@ def move_train
     when 'move'
       move(find_train(train))
     end
+  end
+end
+
+def find_wagon(train, wagon_number)
+  train.wagons.find { |wagon| wagon if wagon.number == wagon_number }
+end
+
+def add_remove_wagons
+  if @trains.empty?
+    p 'Create at least one train first'
+  else
+    
+    train = @prompt.select('Select train first: ', create_trains_menu)
+    if find_train(train).speed > 0
+      p 'Stop the train first!'
+    else
+
+    choices = ['add wagon', 'delete wagon']
+    wagon_number = @prompt.ask('Enter wagon number: ')
+    case @prompt.select('Select option: ', choices)
+
+    when 'add wagon'
+
+      if find_train(train).type == :cargo
+        find_train(train).add_wagon(CargoWagon.new(wagon_number))
+      else
+        find_train(train).add_wagon(PassengerWagon.new(wagon_number))
+      end
+    when 'delete wagon'
+        find_train(train).delete_wagon(find_wagon(find_train(train),wagon_number))
+    end
+  end
   end
 end
 
