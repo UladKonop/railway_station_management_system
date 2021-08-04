@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
+require_relative('./wagon')
+
 class CargoWagon < Wagon
-  def initialize
-    super
+  def initialize(number)
+    super(number)
     @type = :cargo
   end
 end
