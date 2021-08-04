@@ -146,27 +146,27 @@ def add_remove_wagons
   if @trains.empty?
     p 'Create at least one train first'
   else
-    
+
     train = @prompt.select('Select train first: ', create_trains_menu)
-    if find_train(train).speed > 0
+    if find_train(train).speed.positive?
       p 'Stop the train first!'
     else
 
-    choices = ['add wagon', 'delete wagon']
-    wagon_number = @prompt.ask('Enter wagon number: ')
-    case @prompt.select('Select option: ', choices)
+      choices = ['add wagon', 'delete wagon']
+      wagon_number = @prompt.ask('Enter wagon number: ')
+      case @prompt.select('Select option: ', choices)
 
-    when 'add wagon'
+      when 'add wagon'
 
-      if find_train(train).type == :cargo
-        find_train(train).add_wagon(CargoWagon.new(wagon_number))
-      else
-        find_train(train).add_wagon(PassengerWagon.new(wagon_number))
+        if find_train(train).type == :cargo
+          find_train(train).add_wagon(CargoWagon.new(wagon_number))
+        else
+          find_train(train).add_wagon(PassengerWagon.new(wagon_number))
+        end
+      when 'delete wagon'
+        find_train(train).delete_wagon(find_wagon(find_train(train), wagon_number))
       end
-    when 'delete wagon'
-        find_train(train).delete_wagon(find_wagon(find_train(train),wagon_number))
     end
-  end
   end
 end
 

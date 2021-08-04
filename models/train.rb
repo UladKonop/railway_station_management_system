@@ -20,7 +20,7 @@ class Train
 
   def add_wagon(wagon)
     if @speed.zero?
-        self.wagons = wagon
+      self.wagons = wagon
     else
       p 'Please, stop the train first!'
     end
@@ -28,7 +28,7 @@ class Train
 
   def delete_wagon(wagon)
     if @speed.zero?
-        self.wagons.delete_at(self.wagons.index(wagon))
+      wagons.delete_at(wagons.index(wagon))
     else
       p 'Please, stop the train first!'
     end
