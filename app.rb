@@ -70,25 +70,59 @@ require_relative('./models/station')
 # # p train.next_station
 # # binding.irb
 
-@stations = {}
+@stations = []
+
+def find_station(station_name)
+  @stations.find { |station| station if station.name == station_name }
+end
+
+def check_station(station)
+  if @route.starting_station == find_station(station)
+    true
+  elsif @route.end_station == find_station(station)
+    return true
+    binding.irb
+  else
+    @route.intermediate_stations.include?(find_station(station))
+  end
+end
+
+def add_intermediate_stations
+  if @route.nil?
+    p 'Create route first'
+  else
+    intermediate_stations = @prompt.multi_select('Select intermediate stations: ',
+                                                 create_stations_menu)
+    intermediate_stations.each do |intermediate_station|
+      if check_station(intermediate_station)
+        p 'Choose another stations!'
+        p 'These stations are already on the route!'
+      else
+
+        @route.intermediate_stations = find_station(intermediate_station)
+        break
+      end
+    end
+  end
+end
 
 def show_route
   if @route.nil?
     p 'Create route first'
   else
-    p @route
+    p @route.stations
   end
 end
 
 def create_stations_menu
   station_names = []
-  @stations.each_key { |station_name| station_names << station_name }
+  @stations.each { |station| station_names << station.name }
   station_names
 end
 
 def create_station
   name = @prompt.ask('Enter station name:')
-  @stations.store(name, Station.new(name))
+  @stations << Station.new(name)
 end
 
 def create_route
@@ -105,7 +139,8 @@ def create_route
         p 'Choose TWO stations'
       end
     end
-    @route = Route.new(@stations[start_end_stations.first], @stations[start_end_stations.last])
+    @route = Route.new(find_station(start_end_stations.first),
+                       find_station(start_end_stations.last))
   end
 end
 
@@ -116,7 +151,7 @@ loop do
     menu.choice 'Create station', 1
     menu.choice 'Create train', 2, disabled: ''
     menu.choice 'Create route', 3
-    menu.choice 'Add stations to route', 4
+    menu.choice 'Add intermediate stations to route', 4
     menu.choice 'Assign a train route', 5, disabled: ''
     menu.choice 'Manipulations with wagons', 6, disabled: ''
     menu.choice 'Move train', 7, disabled: ''
@@ -127,8 +162,12 @@ loop do
   case cmd
   when 1
     create_station
+  when 2
+    create_train
   when 3
     create_route
+  when 4
+    add_intermediate_stations
   when 8
     show_route
   when 9
