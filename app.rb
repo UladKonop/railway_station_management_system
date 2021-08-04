@@ -8,46 +8,18 @@ require_relative('./models/cargo_train')
 require_relative('./models/cargo_wagon')
 require_relative('./models/passenger_train')
 require_relative('./models/passenger_wagon')
-require_relative('./models/wagon')
+# require_relative('./models/wagon')
 
 # # p train.wagons_amount
 # train.change_wagon_amount(-1)
 # # p train.wagons_amount
 # # p train.speed
 
-# # train.speed = 10
+
 # # train.change_wagon_amount(-1)
 
-# # p train.speed
-# train.stop
-# # p train.speed
 # train.change_wagon_amount(-1)
 # # p train.wagons_amount
-
-# train.route = route
-# # p train.route
-
-# p train.current_station
-# # binding.irb
-# # p train.next_station
-# p '========'
-# # binding.irb
-# # p train.move(:forward)
-# # p '========'
-# train.move(:forward)
-# # p train.current_station
-# # p train.next_station
-# # train.move(:forward)
-# # train.move(:forward)
-# # train.move(:backwards)
-# # train.move(:backwards)
-# train.move(:backwards)
-# p '========'
-# # p train.previous_station
-
-# p train.current_station
-# # p train.next_station
-# # binding.irb
 
 @stations = []
 @trains = []
@@ -57,15 +29,9 @@ def find_station(station_name)
 end
 
 def check_station(station)
-  if @route.starting_station == find_station(station)
-    true
-  elsif @route.end_station == find_station(station)
-    true
-  elsif @route.intermediate_stations.include?(find_station(station))
-    true
-  else
-    false
-  end
+  @route.starting_station == find_station(station) ||
+    @route.end_station == find_station(station) ||
+    @route.intermediate_stations.include?(find_station(station))
 end
 
 def add_intermediate_stations
@@ -96,7 +62,7 @@ end
 
 def create_trains_menu
   train_numbers = []
-  @trains.each { |train| train_numbers << train.number}
+  @trains.each { |train| train_numbers << train.number }
   train_numbers
 end
 
@@ -148,9 +114,39 @@ end
 def assign_route
   if @route.nil?
     p 'Create route first'
+  elsif @trains.empty?
+    p 'Create at least one train first'
   else
     train = @prompt.select('Select train to assign Route: ', create_trains_menu)
     find_train(train).route = @route
+  end
+end
+
+def move(train)
+  directions = %i[forward backwards]
+  direction = @prompt.select('Choose direction: ', directions)
+  case direction
+  when :forward
+    train.move(:forward)
+  when :backwards
+    train.move(:backwards)
+  end
+end
+
+def move_train
+  if @trains.empty?
+    p 'Create at least one train first'
+  else
+    train = @prompt.select('Select train first: ', create_trains_menu)
+    choices = ['change speed', 'stop', 'move']
+    case @prompt.select('Select option: ', choices)
+    when 'change speed'
+      find_train(train).speed = @prompt.ask('Enter speed > 0:').to_i
+    when 'stop'
+      find_train(train).stop
+    when 'move'
+      move(find_train(train))
+    end
   end
 end
 
@@ -161,8 +157,8 @@ def make_choice
     menu.choice 'Create route', 3
     menu.choice 'Add intermediate stations to route', 4
     menu.choice 'Assign a train route', 5
-    menu.choice 'Manipulations with wagons', 6, disabled: ''
-    menu.choice 'Move train', 7, disabled: ''
+    menu.choice 'Manipulations with wagons', 6
+    menu.choice 'SpeedUp/SpeedDown/Move train', 7
     menu.choice 'Show route and trains', 8
     menu.choice 'Exit', 9
   end
@@ -183,6 +179,10 @@ loop do
     add_intermediate_stations
   when 5
     assign_route
+  when 6
+    add_remove_wagons
+  when 7
+    move_train
   when 8
     show_route
   when 9
