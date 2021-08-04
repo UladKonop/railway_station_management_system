@@ -5,32 +5,12 @@ require 'tty-prompt'
 require_relative('./models/route')
 require_relative('./models/train')
 require_relative('./models/station')
+require_relative('./models/cargo_train')
+require_relative('./models/cargo_wagon')
+require_relative('./models/passenger_train')
+require_relative('./models/passenger_wagon')
+require_relative('./models/wagon')
 
-# starting_station = Station.new('starting_station')
-# end_station = Station.new('end_station')
-
-# second_station = Station.new('second_station')
-# third_station = Station.new('third_station')
-# fourth_station = Station.new('4th_station')
-
-# route = Route.new(starting_station, end_station)
-
-# # p route
-# # p route.starting_station
-# # p route.end_station
-# # p route.intermediate_stations
-
-# route.intermediate_stations = second_station
-# route.intermediate_stations = third_station
-# # route.intermediate_stations = fourth_station
-# # p route.intermediate_stations
-# # route.delete_intermediate_station(third_station)
-# # p route.intermediate_stations
-
-# train = Train.new('aa111', :cargo, 33)
-# # p train
-# # p train.number
-# # p train.type
 # # p train.wagons_amount
 # train.change_wagon_amount(-1)
 # # p train.wagons_amount
@@ -71,6 +51,7 @@ require_relative('./models/station')
 # # binding.irb
 
 @stations = []
+@trains = []
 
 def find_station(station_name)
   @stations.find { |station| station if station.name == station_name }
@@ -80,10 +61,11 @@ def check_station(station)
   if @route.starting_station == find_station(station)
     true
   elsif @route.end_station == find_station(station)
-    return true
-    binding.irb
+    true
+  elsif @route.intermediate_stations.include?(find_station(station))
+    true
   else
-    @route.intermediate_stations.include?(find_station(station))
+    false
   end
 end
 
@@ -98,7 +80,6 @@ def add_intermediate_stations
         p 'Choose another stations!'
         p 'These stations are already on the route!'
       else
-
         @route.intermediate_stations = find_station(intermediate_station)
         break
       end
@@ -144,12 +125,21 @@ def create_route
   end
 end
 
-@prompt = TTY::Prompt.new
+def create_train
+  types = %w[cargo passenger]
+  type = @prompt.select('Choose train type: ', types)
+  case type
+  when 'cargo'
+    @trains << CargoTrain.new(@prompt.ask('Please, enter train number: '))
+  when 'passenger'
+    @trains << PassengerTrain.new(@prompt.ask('Please, enter train number: '))
+  end
+end
 
-loop do
-  cmd = @prompt.select('Select an action: ', per_page: 9) do |menu|
+def make_choice
+  @prompt.select('Select an action: ', per_page: 9) do |menu|
     menu.choice 'Create station', 1
-    menu.choice 'Create train', 2, disabled: ''
+    menu.choice 'Create train', 2
     menu.choice 'Create route', 3
     menu.choice 'Add intermediate stations to route', 4
     menu.choice 'Assign a train route', 5, disabled: ''
@@ -158,8 +148,12 @@ loop do
     menu.choice 'Show route and trains', 8
     menu.choice 'Exit', 9
   end
+end
 
-  case cmd
+@prompt = TTY::Prompt.new
+
+loop do
+  case make_choice
   when 1
     create_station
   when 2
