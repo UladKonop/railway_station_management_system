@@ -10,11 +10,20 @@ require_relative('./models/passenger_train')
 require_relative('./models/passenger_wagon')
 
 class Interface
-  @@stations = []
-  @@trains = []
+  def initialize
+    @stations = []
+    @trains = []
+  end
+
+  def start
+    @prompt = TTY::Prompt.new
+    menu_loop
+  end
+
+  private
 
   def find_station(station_name)
-    @@stations.find { |station| station if station.name == station_name }
+    @stations.find { |station| station if station.name == station_name }
   end
 
   def check_station(station)
@@ -51,23 +60,23 @@ class Interface
 
   def create_trains_menu
     train_numbers = []
-    @@trains.each { |train| train_numbers << train.number }
+    @trains.each { |train| train_numbers << train.number }
     train_numbers
   end
 
   def create_stations_menu
     station_names = []
-    @@stations.each { |station| station_names << station.name }
+    @stations.each { |station| station_names << station.name }
     station_names
   end
 
   def create_station
     name = @prompt.ask('Enter station name:')
-    @@stations << Station.new(name)
+    @stations << Station.new(name)
   end
 
   def create_route
-    if @@stations.empty? || @@stations.size == 1
+    if @stations.empty? || @stations.size == 1
       p 'Create at least TWO stations first'
     else
       start_end_stations = []
@@ -90,20 +99,20 @@ class Interface
     type = @prompt.select('Choose train type: ', types)
     case type
     when 'cargo'
-      @@trains << CargoTrain.new(@prompt.ask('Please, enter train number: '))
+      @trains << CargoTrain.new(@prompt.ask('Please, enter train number: '))
     when 'passenger'
-      @@trains << PassengerTrain.new(@prompt.ask('Please, enter train number: '))
+      @trains << PassengerTrain.new(@prompt.ask('Please, enter train number: '))
     end
   end
 
   def find_train(train_number)
-    @@trains.find { |train| train if train.number == train_number }
+    @trains.find { |train| train if train.number == train_number }
   end
 
   def assign_route
     if @route.nil?
       p 'Create route first'
-    elsif @@trains.empty?
+    elsif @trains.empty?
       p 'Create at least one train first'
     else
       train = @prompt.select('Select train to assign Route: ', create_trains_menu)
@@ -123,7 +132,7 @@ class Interface
   end
 
   def move_train
-    if @@trains.empty?
+    if @trains.empty?
       p 'Create at least one train first'
     else
       train = @prompt.select('Select train first: ', create_trains_menu)
@@ -144,7 +153,7 @@ class Interface
   end
 
   def add_remove_wagons
-    if @@trains.empty?
+    if @trains.empty?
       p 'Create at least one train first'
     else
 
@@ -192,7 +201,7 @@ class Interface
         create_station
       when 2
         create_train
-        p @@trains
+        p @trains
       when 3
         create_route
       when 4
@@ -209,10 +218,5 @@ class Interface
         break if @prompt.yes?('Do you really want to exit?')
       end
     end
-  end
-
-  def start
-    @prompt = TTY::Prompt.new
-    menu_loop
   end
 end
