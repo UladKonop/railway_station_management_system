@@ -2,11 +2,14 @@
 
 require_relative('./route')
 require_relative('./station')
+require_relative('../modules/manufacturer')
 
 class Train
   attr_reader :number, :type, :wagons, :route
 
   attr_accessor :speed
+
+  include Manufacturer
 
   def initialize(number)
     @number = number
