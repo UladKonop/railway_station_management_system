@@ -180,8 +180,19 @@ class Interface
     end
   end
 
+  def add_manufacturer
+    choise = @prompt.select("Choose wagons or trains: ", %w(wagons trains))
+
+    case choise
+    when 'wagons'
+    when 'trains'
+      train = @prompt.select('Select train first: ', create_trains_menu)
+      find_train(train).manufacturer = @prompt.ask('Enter manufacturer: ')
+    end
+  end
+
   def make_choice
-    @prompt.select('Select an action: ', per_page: 9) do |menu|
+    @prompt.select('Select an action: ', per_page: 10) do |menu|
       menu.choice 'Create station', 1
       menu.choice 'Create train', 2
       menu.choice 'Create route', 3
@@ -190,7 +201,8 @@ class Interface
       menu.choice 'Manipulations with wagons', 6
       menu.choice 'SpeedUp/SpeedDown/Move train', 7
       menu.choice 'Show route and trains', 8
-      menu.choice 'Exit', 9
+      menu.choice 'Add manufacturer', 9
+      menu.choice 'Exit', 10
     end
   end
 
@@ -215,6 +227,8 @@ class Interface
       when 8
         show_route
       when 9
+        add_manufacturer
+      when 10
         break if @prompt.yes?('Do you really want to exit?')
       end
     end
