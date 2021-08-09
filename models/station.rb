@@ -6,6 +6,11 @@ class Station
   def initialize(name)
     @name = name
     @trains = []
+    self.class.all << self
+  end
+
+  def self.all 
+    @all ||= []
   end
 
   def trains=(train)
