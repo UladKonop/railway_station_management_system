@@ -180,15 +180,30 @@ class Interface
     end
   end
 
+  def create_wagons_menu(train_number)
+    wagons_numbers = []
+    find_train(train_number).wagons.each { |wagon| wagons_numbers << wagon.number }
+    wagons_numbers
+  end
+
   def add_manufacturer
-    choise = @prompt.select("Choose wagons or trains: ", %w(wagons trains))
+    choise = @prompt.select('Choose wagons or trains: ', %w[wagons trains])
 
     case choise
     when 'wagons'
+      train_number = @prompt.select('Select train first: ', create_trains_menu)
+      if  find_train(train_number).wagons.empty?
+        p 'Add wagons to train first!'
+      else
+        wagon_number = @prompt.select('Select wagon: ', create_wagons_menu(train_number))
+        find_wagon(find_train(train_number),
+                   wagon_number).manufacturer = @prompt.ask('Enter manufacturer: ')
+      end
     when 'trains'
-      train = @prompt.select('Select train first: ', create_trains_menu)
-      find_train(train).manufacturer = @prompt.ask('Enter manufacturer: ')
+      train_number = @prompt.select('Select train: ', create_trains_menu)
+      find_train(train_number).manufacturer = @prompt.ask('Enter manufacturer: ')
     end
+    p find_train(train_number)
   end
 
   def make_choice
