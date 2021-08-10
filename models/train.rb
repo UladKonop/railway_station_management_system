@@ -15,6 +15,15 @@ class Train
     @number = number
     @speed = 0
     @wagons = []
+    self.class.all << self
+  end
+
+  def self.all
+    @@all ||= []
+  end
+
+  def self.find(train_number)
+    @@all.select { |train| train.number == train_number }
   end
 
   def stop
