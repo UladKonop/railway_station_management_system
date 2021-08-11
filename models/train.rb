@@ -3,6 +3,7 @@
 require_relative('./route')
 require_relative('./station')
 require_relative('../modules/manufacturer')
+require_relative('../modules/instance_counter')
 
 class Train
   attr_reader :number, :type, :wagons, :route
@@ -10,12 +11,14 @@ class Train
   attr_accessor :speed
 
   include Manufacturer
+  include InstanceCounter
 
   def initialize(number)
     @number = number
     @speed = 0
     @wagons = []
     self.class.all << self
+    register_instance
   end
 
   def self.all

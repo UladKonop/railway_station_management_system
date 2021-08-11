@@ -1,12 +1,17 @@
 # frozen_string_literal: true
 
+require_relative('../modules/instance_counter')
+
 class Station
   attr_reader :name, :trains
+
+  include InstanceCounter
 
   def initialize(name)
     @name = name
     @trains = []
     self.class.all << self
+    register_instance
   end
 
   def self.all
