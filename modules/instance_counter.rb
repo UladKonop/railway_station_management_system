@@ -7,16 +7,16 @@ module InstanceCounter
   end
 
   module ClassMethods
-    attr_accessor :instances
+    attr_writer :instances
 
-    def count_instance
-      self.instances = instances.to_i + 1
+    def instances
+      @instances ||= 0
     end
   end
 
   module InstanceMethods
     def register_instance
-      self.class.count_instance
+      self.class.instances += 1
     end
   end
 end
