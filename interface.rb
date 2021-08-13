@@ -16,7 +16,7 @@ class Interface
   end
 
   def start
-    @prompt = TTY::Prompt.new
+    @prompt = TTY::Prompt.new(track_history: false)
     menu_loop
   end
 
