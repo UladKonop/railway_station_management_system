@@ -23,8 +23,8 @@ class Train
     @speed = 0
     @wagons = []
     self.class.all << self
-    register_instance
     validate!
+    register_instance
   end
 
   def self.all
