@@ -4,14 +4,19 @@ require_relative('./route')
 require_relative('./station')
 require_relative('../modules/manufacturer')
 require_relative('../modules/instance_counter')
+require_relative('../modules/object_validator')
 
 class Train
+  TRAIN_NUMBER_TEMPLATE = /^\w{3}-{0,1}\w{2}/.freeze
+  VALIDATION_MESSAGE = 'The number must match the format: abc-de. You can use letters and digits. A hyphen is not strictly required'
+
   attr_reader :number, :type, :wagons, :route
 
   attr_accessor :speed
 
   include Manufacturer
   include InstanceCounter
+  extend ObjectValidator
 
   def initialize(number)
     @number = number
@@ -19,6 +24,7 @@ class Train
     @wagons = []
     self.class.all << self
     register_instance
+    validate!
   end
 
   def self.all
@@ -79,12 +85,14 @@ class Train
       next_station ? move_train_forward : 'The train is already at the final station!'
     when :backwards
       previous_station ? move_train_backwards : 'The train is already at the first station!'
-    else
-      p 'Train can only move :forward and :backwards!'
     end
   end
 
   private
+
+  def validate!
+    raise VALIDATION_MESSAGE unless TRAIN_NUMBER_TEMPLATE.match?(@number)
+  end
 
   def wagons=(wagon)
     @wagons << wagon
