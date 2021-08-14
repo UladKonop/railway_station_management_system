@@ -99,9 +99,19 @@ class Interface
     type = @prompt.select('Choose train type: ', types)
     case type
     when 'cargo'
+      begin
       @trains << CargoTrain.new(@prompt.ask('Please, enter train number: '))
+      rescue StandardError => e
+        p e.message
+        retry
+      end
     when 'passenger'
+      begin
       @trains << PassengerTrain.new(@prompt.ask('Please, enter train number: '))
+    rescue StandardError => e
+      p e.message
+      retry
+    end
     end
   end
 
