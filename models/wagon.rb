@@ -3,9 +3,9 @@
 require_relative('../modules/manufacturer')
 require_relative('../modules/object_validator')
 
-WAGON_NUMBER_TEMPLATE = /^\d+$/.freeze
-
 class Wagon
+  WAGON_NUMBER_TEMPLATE = /^\d+$/.freeze
+
   attr_reader :number
 
   include Manufacturer
