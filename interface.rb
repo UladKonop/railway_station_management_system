@@ -72,7 +72,11 @@ class Interface
 
   def create_station
     name = @prompt.ask('Enter station name:')
+    begin
     @stations << Station.new(name)
+  rescue StandardError => e
+    p e.message
+  end  
   end
 
   def create_route
