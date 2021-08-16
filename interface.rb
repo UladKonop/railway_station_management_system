@@ -73,10 +73,10 @@ class Interface
   def create_station
     name = @prompt.ask('Enter station name:')
     begin
-    @stations << Station.new(name)
-  rescue StandardError => e
-    p e.message
-  end  
+      @stations << Station.new(name)
+    rescue StandardError => e
+      p e.message
+    end
   end
 
   def create_route
@@ -104,18 +104,18 @@ class Interface
     case type
     when 'cargo'
       begin
-      @trains << CargoTrain.new(@prompt.ask('Please, enter train number: '))
+        @trains << CargoTrain.new(@prompt.ask('Please, enter train number: '))
       rescue StandardError => e
         p e.message
         retry
       end
     when 'passenger'
       begin
-      @trains << PassengerTrain.new(@prompt.ask('Please, enter train number: '))
-    rescue StandardError => e
-      p e.message
-      retry
-    end
+        @trains << PassengerTrain.new(@prompt.ask('Please, enter train number: '))
+      rescue StandardError => e
+        p e.message
+        retry
+      end
     end
   end
 
