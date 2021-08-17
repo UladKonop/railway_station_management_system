@@ -94,11 +94,11 @@ class Interface
         end
       end
       begin
-      @route = Route.new(find_station(start_end_stations.first),
-                         find_station(start_end_stations.last))
-                        rescue StandardError => e
-                          p e.message
-                        end             
+        @route = Route.new(find_station(start_end_stations.first),
+                           find_station(start_end_stations.last))
+      rescue StandardError => e
+        p e.message
+      end
     end
   end
 
