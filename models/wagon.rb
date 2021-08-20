@@ -5,6 +5,7 @@ require_relative('../modules/object_validator')
 
 class Wagon
   WAGON_NUMBER_TEMPLATE = /^\d+$/.freeze
+  VALIDATION_MESSAGE = 'The number must consist of digits'
 
   attr_reader :number
 
@@ -19,6 +20,6 @@ class Wagon
   private
 
   def validate!
-    raise 'The number must consist of digits' unless WAGON_NUMBER_TEMPLATE.match?(@number)
+    raise VALIDATION_MESSAGE unless WAGON_NUMBER_TEMPLATE.match?(@number)
   end
 end
