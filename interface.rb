@@ -187,9 +187,19 @@ class Interface
         when 'add wagon'
 
           if find_train(train).type == :cargo
-            find_train(train).add_wagon(CargoWagon.new(wagon_number))
+            volume = @prompt.ask('Enter amount of wagon volume: ')
+            begin
+            find_train(train).add_wagon(CargoWagon.new(wagon_number, volume))
+          rescue StandardError => e
+            p e.message
+          end
           else
-            find_train(train).add_wagon(PassengerWagon.new(wagon_number))
+            seats_amount = @prompt.ask('Enter amount of wagon seats: ')
+            begin
+            find_train(train).add_wagon(PassengerWagon.new(wagon_number, seats_amount))
+          rescue StandardError => e
+            p e.message
+          end
           end
         when 'delete wagon'
           find_train(train).delete_wagon(find_wagon(find_train(train), wagon_number))
@@ -230,7 +240,7 @@ class Interface
       menu.choice 'Create train', 2
       menu.choice 'Create route', 3
       menu.choice 'Add intermediate stations to route', 4
-      menu.choice 'Assign a train route', 5
+      menu.choice 'Assign a route to train ', 5
       menu.choice 'Manipulations with wagons', 6
       menu.choice 'SpeedUp/SpeedDown/Move train', 7
       menu.choice 'Show route and trains', 8
