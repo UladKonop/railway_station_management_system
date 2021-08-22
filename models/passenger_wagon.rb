@@ -16,8 +16,6 @@ class PassengerWagon < Wagon
     @seats_amount - @occupied_seats
   end
 
-  private
-
   def occupy_seat
     if (@seats_amount - 1).negative?
       p 'There are no more available seats!'

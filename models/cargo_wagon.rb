@@ -16,8 +16,6 @@ class CargoWagon < Wagon
     @volume - @occupied_volume
   end
 
-  private
-
   def occupy_volume(volume_to_occupy)
     if (@volume - volume_to_occupy).negative?
       p 'There are no more available volume!'
