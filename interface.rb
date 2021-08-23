@@ -123,6 +123,10 @@ class Interface
     end
   end
 
+  def select_train_number
+    @prompt.select('Select train: ', create_trains_menu)
+  end
+
   def find_train(train_number)
     @trains.find { |train| train if train.number == train_number }
   end
@@ -133,8 +137,8 @@ class Interface
     elsif @trains.empty?
       p 'Create at least one train first'
     else
-      train = @prompt.select('Select train to assign Route: ', create_trains_menu)
-      find_train(train).route = @route
+      train_number = select_train_number
+      find_train(train_number).route = @route
     end
   end
 
@@ -153,15 +157,15 @@ class Interface
     if @trains.empty?
       p 'Create at least one train first'
     else
-      train = @prompt.select('Select train first: ', create_trains_menu)
+      train_number = select_train_number
       choices = ['change speed', 'stop', 'move']
       case @prompt.select('Select option: ', choices)
       when 'change speed'
-        find_train(train).speed = @prompt.ask('Enter speed > 0:').to_i
+        find_train(train_number).speed = @prompt.ask('Enter speed > 0:').to_i
       when 'stop'
-        find_train(train).stop
+        find_train(train_number).stop
       when 'move'
-        move(find_train(train))
+        move(find_train(train_number))
       end
     end
   end
@@ -174,35 +178,32 @@ class Interface
     if @trains.empty?
       p 'Create at least one train first'
     else
-
-      train = @prompt.select('Select train first: ', create_trains_menu)
-      if find_train(train).speed.positive?
+      train_number = select_train_number
+      if find_train(train_number).speed.positive?
         p 'Stop the train first!'
       else
-
         choices = ['add wagon', 'delete wagon']
         wagon_number = @prompt.ask('Enter wagon number: ')
+
         case @prompt.select('Select option: ', choices)
-
         when 'add wagon'
-
-          if find_train(train).type == :cargo
-            volume = @prompt.ask('Enter amount of wagon volume: ')
+          if find_train(train_number).type == :cargo
+            volume = @prompt.ask('Enter amount of wagon volume: ').to_f
             begin
-            find_train(train).add_wagon(CargoWagon.new(wagon_number, volume))
-          rescue StandardError => e
-            p e.message
-          end
+              find_train(train_number).add_wagon(CargoWagon.new(wagon_number, volume))
+            rescue StandardError => e
+              p e.message
+            end
           else
             seats_amount = @prompt.ask('Enter amount of wagon seats: ')
             begin
-            find_train(train).add_wagon(PassengerWagon.new(wagon_number, seats_amount))
-          rescue StandardError => e
-            p e.message
-          end
+              find_train(train_number).add_wagon(PassengerWagon.new(wagon_number, seats_amount))
+            rescue StandardError => e
+              p e.message
+            end
           end
         when 'delete wagon'
-          find_train(train).delete_wagon(find_wagon(find_train(train), wagon_number))
+          find_train(train_number).delete_wagon(find_wagon(find_train(train_number), wagon_number))
         end
       end
     end
@@ -216,10 +217,9 @@ class Interface
 
   def add_manufacturer
     choise = @prompt.select('Choose wagons or trains: ', %w[wagons trains])
-
     case choise
     when 'wagons'
-      train_number = @prompt.select('Select train first: ', create_trains_menu)
+      train_number = select_train_number
       if  find_train(train_number).wagons.empty?
         p 'Add wagons to train first!'
       else
@@ -228,24 +228,46 @@ class Interface
                    wagon_number).manufacturer = @prompt.ask('Enter manufacturer: ')
       end
     when 'trains'
-      train_number = @prompt.select('Select train: ', create_trains_menu)
+      train_number = select_train_number
       find_train(train_number).manufacturer = @prompt.ask('Enter manufacturer: ')
     end
     p find_train(train_number)
   end
 
+  def occupy
+    if @trains.empty?
+      p 'Create at least one train first'
+    else
+      train_number = select_train_number
+      train = find_train(train_number)
+      if  train.wagons.empty?
+        p 'Add wagons to train first!'
+      else
+        case train.type
+        when :cargo
+          wagon_number = @prompt.select('Select wagon: ', create_wagons_menu(train_number))
+          find_wagon(train, wagon_number).occupy_volume(@prompt.ask('Enter volume: ').to_f)
+        when :passenger
+          wagon_number = @prompt.select('Select wagon: ', create_wagons_menu(train_number))
+          find_wagon(train, wagon_number).occupy_seat
+        end
+      end
+    end
+  end
+
   def make_choice
-    @prompt.select('Select an action: ', per_page: 10) do |menu|
+    @prompt.select('Select an action: ', per_page: 11) do |menu|
       menu.choice 'Create station', 1
       menu.choice 'Create train', 2
       menu.choice 'Create route', 3
       menu.choice 'Add intermediate stations to route', 4
       menu.choice 'Assign a route to train ', 5
       menu.choice 'Manipulations with wagons', 6
-      menu.choice 'SpeedUp/SpeedDown/Move train', 7
-      menu.choice 'Show route and trains', 8
-      menu.choice 'Add manufacturer', 9
-      menu.choice 'Exit', 10
+      menu.choice 'SpeedUp / SpeedDown / Move train', 7
+      menu.choice 'Occupy seat / volume', 8
+      menu.choice 'Show route and trains', 9
+      menu.choice 'Add manufacturer', 10
+      menu.choice 'Exit', 11
     end
   end
 
@@ -268,10 +290,12 @@ class Interface
       when 7
         move_train
       when 8
-        show_route
+        occupy
       when 9
-        add_manufacturer
+        show_route
       when 10
+        add_manufacturer
+      when 11
         break if @prompt.yes?('Do you really want to exit?')
       end
     end
