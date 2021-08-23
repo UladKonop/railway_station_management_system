@@ -9,7 +9,7 @@ class CargoWagon < Wagon
     super(number)
     @type = :cargo
     @volume = volume
-    @occupied_volume = 0
+    @occupied_volume = 0.0
   end
 
   def free_volume_amount
@@ -17,7 +17,7 @@ class CargoWagon < Wagon
   end
 
   def occupy_volume(volume_to_occupy)
-    if (@volume - volume_to_occupy).negative?
+    if (free_volume_amount - volume_to_occupy).negative?
       p 'There are no more available volume!'
     else
       @occupied_volume += volume_to_occupy

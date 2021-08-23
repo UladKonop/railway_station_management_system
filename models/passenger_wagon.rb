@@ -17,7 +17,7 @@ class PassengerWagon < Wagon
   end
 
   def occupy_seat
-    if (@seats_amount - 1).negative?
+    if (free_seats_amount - 1).negative?
       p 'There are no more available seats!'
     else
       @occupied_seats += 1
