@@ -144,8 +144,7 @@ class Interface
     elsif @trains.empty?
       p 'Create at least one train first'
     else
-      train_number = select_train_number
-      find_train(train_number).route = @route
+      find_train(select_train_number).route = @route
     end
   end
 
@@ -231,23 +230,26 @@ class Interface
     wagons_numbers
   end
 
+  def enter_manufacturer
+    @prompt.ask('Enter manufacturer: ')
+  end
+
   def add_manufacturer
-    choise = @prompt.select('Choose wagons or trains: ', %w[wagons trains])
-    case choise
+    case @prompt.select('Choose wagons or trains: ', %w[wagons trains])
     when 'wagons'
       train_number = select_train_number
-      if  find_train(train_number).wagons.empty?
+      train = find_train(train_number)
+      if  train.wagons.empty?
         p 'Add wagons to train first!'
       else
         wagon_number = @prompt.select('Select wagon: ', create_wagons_menu(train_number))
-        find_wagon(find_train(train_number),
-                   wagon_number).manufacturer = @prompt.ask('Enter manufacturer: ')
+        find_wagon(train, wagon_number).manufacturer = enter_manufacturer
       end
     when 'trains'
       train_number = select_train_number
-      find_train(train_number).manufacturer = @prompt.ask('Enter manufacturer: ')
+      train.manufacturer = enter_manufacturer
     end
-    p find_train(train_number)
+    p train
   end
 
   def occupy
@@ -259,12 +261,11 @@ class Interface
       if  train.wagons.empty?
         p 'Add wagons to train first!'
       else
+        wagon_number = @prompt.select('Select wagon: ', create_wagons_menu(train_number))
         case train.type
         when :cargo
-          wagon_number = @prompt.select('Select wagon: ', create_wagons_menu(train_number))
           find_wagon(train, wagon_number).occupy_volume(@prompt.ask('Enter volume: ').to_f)
         when :passenger
-          wagon_number = @prompt.select('Select wagon: ', create_wagons_menu(train_number))
           find_wagon(train, wagon_number).occupy_seat
         end
       end
