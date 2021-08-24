@@ -102,24 +102,31 @@ class Interface
     end
   end
 
-  def create_train
+  def choose_train_type
     types = %w[cargo passenger]
-    type = @prompt.select('Choose train type: ', types)
-    case type
+    @prompt.select('Choose train type: ', types)
+  end
+
+  def create_cargo_train
+    @trains << CargoTrain.new(@prompt.ask('Please, enter train number: '))
+  rescue StandardError => e
+    p e.message
+    retry
+  end
+
+  def create_passenger_train
+    @trains << PassengerTrain.new(@prompt.ask('Please, enter train number: '))
+  rescue StandardError => e
+    p e.message
+    retry
+  end
+
+  def create_train
+    case choose_train_type
     when 'cargo'
-      begin
-        @trains << CargoTrain.new(@prompt.ask('Please, enter train number: '))
-      rescue StandardError => e
-        p e.message
-        retry
-      end
+      create_cargo_train
     when 'passenger'
-      begin
-        @trains << PassengerTrain.new(@prompt.ask('Please, enter train number: '))
-      rescue StandardError => e
-        p e.message
-        retry
-      end
+      create_passenger_train
     end
   end
 
@@ -143,12 +150,11 @@ class Interface
   end
 
   def move(train)
-    directions = %i[forward backwards]
-    direction = @prompt.select('Choose direction: ', directions)
-    case direction
-    when :forward
+    directions = %w[forward backwards]
+    case @prompt.select('Choose direction: ', directions)
+    when 'forward'
       train.move(:forward)
-    when :backwards
+    when 'backwards'
       train.move(:backwards)
     end
   end
@@ -158,14 +164,15 @@ class Interface
       p 'Create at least one train first'
     else
       train_number = select_train_number
+      train = find_train(train_number)
       choices = ['change speed', 'stop', 'move']
       case @prompt.select('Select option: ', choices)
       when 'change speed'
-        find_train(train_number).speed = @prompt.ask('Enter speed > 0:').to_i
+        train.speed = @prompt.ask('Enter speed > 0:').to_i
       when 'stop'
-        find_train(train_number).stop
+        train.stop
       when 'move'
-        move(find_train(train_number))
+        move(train)
       end
     end
   end
@@ -174,12 +181,31 @@ class Interface
     train.wagons.find { |wagon| wagon if wagon.number == wagon_number }
   end
 
+  def add_cargo_wagon(train, wagon_number)
+    volume = @prompt.ask('Enter amount of wagon volume: ').to_f
+    begin
+      train.add_wagon(CargoWagon.new(wagon_number, volume))
+    rescue StandardError => e
+      p e.message
+    end
+  end
+
+  def add_passenger_wagon(train, wagon_number)
+    seats_amount = @prompt.ask('Enter amount of wagon seats: ')
+    begin
+      train.add_wagon(PassengerWagon.new(wagon_number, seats_amount))
+    rescue StandardError => e
+      p e.message
+    end
+  end
+
   def add_remove_wagons
     if @trains.empty?
       p 'Create at least one train first'
     else
       train_number = select_train_number
-      if find_train(train_number).speed.positive?
+      train = find_train(train_number)
+      if train.speed.positive?
         p 'Stop the train first!'
       else
         choices = ['add wagon', 'delete wagon']
@@ -187,23 +213,13 @@ class Interface
 
         case @prompt.select('Select option: ', choices)
         when 'add wagon'
-          if find_train(train_number).type == :cargo
-            volume = @prompt.ask('Enter amount of wagon volume: ').to_f
-            begin
-              find_train(train_number).add_wagon(CargoWagon.new(wagon_number, volume))
-            rescue StandardError => e
-              p e.message
-            end
+          if train.type == :cargo
+            add_cargo_wagon(train, wagon_number)
           else
-            seats_amount = @prompt.ask('Enter amount of wagon seats: ')
-            begin
-              find_train(train_number).add_wagon(PassengerWagon.new(wagon_number, seats_amount))
-            rescue StandardError => e
-              p e.message
-            end
+            add_passenger_wagon(train, wagon_number)
           end
         when 'delete wagon'
-          find_train(train_number).delete_wagon(find_wagon(find_train(train_number), wagon_number))
+          train.delete_wagon(find_wagon(train, wagon_number))
         end
       end
     end
