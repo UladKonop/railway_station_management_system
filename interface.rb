@@ -272,8 +272,14 @@ class Interface
     end
   end
 
+  def print_trains_on_station
+    station_name = @prompt.select('Select station: ', create_stations_menu)
+    station = find_station(station_name)
+    station.return_trains_for_print {|train| p "Train number: #{train.number}, train type: #{train.type}, wagons amount: #{train.wagons.size}"}
+  end
+
   def make_choice
-    @prompt.select('Select an action: ', per_page: 11) do |menu|
+    @prompt.select('Select an action: ', per_page: 13) do |menu|
       menu.choice 'Create station', 1
       menu.choice 'Create train', 2
       menu.choice 'Create route', 3
@@ -284,7 +290,9 @@ class Interface
       menu.choice 'Occupy seat / volume', 8
       menu.choice 'Show route and trains', 9
       menu.choice 'Add manufacturer', 10
-      menu.choice 'Exit', 11
+      menu.choice 'Print trains on station', 11
+      menu.choice 'Print train wagons', 12
+      menu.choice 'Exit', 13
     end
   end
 
@@ -313,6 +321,10 @@ class Interface
       when 10
         add_manufacturer
       when 11
+        print_trains_on_station
+      when 12
+        print_train_wagons
+      when 13
         break if @prompt.yes?('Do you really want to exit?')
       end
     end
