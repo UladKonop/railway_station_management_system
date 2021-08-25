@@ -17,6 +17,10 @@ class Station
     register_instance
   end
 
+  def return_trains_for_print
+    @trains.each {|train| yield train}
+  end
+
   def self.all
     @all ||= []
   end
