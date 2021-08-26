@@ -27,6 +27,10 @@ class Train
     register_instance
   end
 
+  def return_wagons_for_print
+    @wagons.each {|wagon| yield wagon}
+  end
+
   def self.all
     @@all ||= []
   end
