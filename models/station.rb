@@ -17,8 +17,8 @@ class Station
     register_instance
   end
 
-  def return_trains_for_print
-    @trains.each {|train| yield train}
+  def return_trains_for_print(&block)
+    @trains.each(&block)
   end
 
   def self.all

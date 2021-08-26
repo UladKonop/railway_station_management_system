@@ -27,8 +27,8 @@ class Train
     register_instance
   end
 
-  def return_wagons_for_print
-    @wagons.each {|wagon| yield wagon}
+  def return_wagons_for_print(&block)
+    @wagons.each(&block)
   end
 
   def self.all
