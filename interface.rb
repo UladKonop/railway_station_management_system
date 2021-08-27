@@ -32,12 +32,17 @@ class Interface
       @route.intermediate_stations.include?(find_station(station))
   end
 
+  def create_stations_menu
+    station_names = []
+    @stations.each { |station| station_names << station.name }
+    station_names
+  end
+
   def add_intermediate_stations
     if @route.nil?
       p 'Create route first'
     else
-      intermediate_stations = @prompt.multi_select('Select intermediate stations: ',
-                                                   create_stations_menu)
+      intermediate_stations = create_stations_menu
       intermediate_stations.each do |intermediate_station|
         if check_station(intermediate_station)
           p 'Choose another stations!'
@@ -64,19 +69,16 @@ class Interface
     train_numbers
   end
 
-  def create_stations_menu
-    station_names = []
-    @stations.each { |station| station_names << station.name }
-    station_names
+  def create_station
+    @stations << Station.new(@prompt.ask('Enter station name:'))
+  rescue StandardError => e
+    p e.message
   end
 
-  def create_station
-    name = @prompt.ask('Enter station name:')
-    begin
-      @stations << Station.new(name)
-    rescue StandardError => e
-      p e.message
-    end
+  def new_route(first_station, last_station)
+    @route = Route.new(first_station, last_station)
+  rescue StandardError => e
+    p e.message
   end
 
   def create_route
@@ -93,18 +95,12 @@ class Interface
           p 'Choose TWO stations'
         end
       end
-      begin
-        @route = Route.new(find_station(start_end_stations.first),
-                           find_station(start_end_stations.last))
-      rescue StandardError => e
-        p e.message
-      end
+      new_route(find_station(start_end_stations.first), find_station(start_end_stations.last))
     end
   end
 
   def choose_train_type
-    types = %w[cargo passenger]
-    @prompt.select('Choose train type: ', types)
+    @prompt.select('Choose train type: ', %w[cargo passenger])
   end
 
   def create_cargo_train
@@ -164,8 +160,7 @@ class Interface
     else
       train_number = select_train_number
       train = find_train(train_number)
-      choices = ['change speed', 'stop', 'move']
-      case @prompt.select('Select option: ', choices)
+      case @prompt.select('Select option: ', ['change speed', 'stop', 'move'])
       when 'change speed'
         train.speed = @prompt.ask('Enter speed > 0:').to_i
       when 'stop'
@@ -207,10 +202,9 @@ class Interface
       if train.speed.positive?
         p 'Stop the train first!'
       else
-        choices = ['add wagon', 'delete wagon']
         wagon_number = @prompt.ask('Enter wagon number: ')
 
-        case @prompt.select('Select option: ', choices)
+        case @prompt.select('Select option: ', ['add wagon', 'delete wagon'])
         when 'add wagon'
           if train.type == :cargo
             add_cargo_wagon(train, wagon_number)
@@ -247,6 +241,7 @@ class Interface
       end
     when 'trains'
       train_number = select_train_number
+      train = find_train(train_number)
       train.manufacturer = enter_manufacturer
     end
     p train
