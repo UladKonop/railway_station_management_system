@@ -275,7 +275,24 @@ class Interface
   def print_trains_on_station
     station_name = @prompt.select('Select station: ', create_stations_menu)
     station = find_station(station_name)
-    station.return_trains_for_print {|train| p "Train number: #{train.number}, train type: #{train.type}, wagons amount: #{train.wagons.size}"}
+    station.return_trains_for_print do |train|
+      p "Train number: #{train.number}, train type: #{train.type}, wagons amount: #{train.wagons.size}"
+    end
+  end
+
+  def print_train_wagons
+    train_number = select_train_number
+    train = find_train(train_number)
+
+    if train.type == :cargo
+      train.return_wagons_for_print do |wagon|
+        p "Wagon number: #{wagon.number}, wagon type: #{train.type}, free volume amount: #{wagon.free_volume_amount}, occupied volume amount: #{wagon.occupied_volume}"
+      end
+    else
+      train.return_wagons_for_print do |wagon|
+        p "Wagon number: #{wagon.number}, wagon type: #{train.type}, free seats amount: #{wagon.free_seats_amount}, occupied volume amount: #{wagon.occupied_seats}"
+      end
+    end
   end
 
   def make_choice
