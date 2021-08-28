@@ -7,15 +7,26 @@ module Accessors
   end
 
   module ClassMethods
-    def attr_accessor_with_history(*method_names)
-      # p attrs.inspect
-      method_names.each do |method_name|
-        variable_name = "@#{method_name}".to_sym
-        # define_method("#{method_name}_history".to_sym){ |value| }
-        define_method(method_name) { instance_variable_get(variable_name) }
-        define_method("#{method_name}=".to_sym) { |value| instance_variable_set(variable_name, value) }
+    def attr_accessor_with_history(*names)
+      names.each do |name|
+        raise TypeError, 'method name is not symbol' unless name.is_a?(Symbol)
+
+        variable_name_symbol = "@#{name}".to_sym
+        variable_name_array_symbol = "@#{name}_array".to_sym
+
+        define_method(name) { instance_variable_get(variable_name_symbol) }
+        define_method("#{name}=".to_sym) do |value|
+          instance_variable_set(variable_name_symbol, value)
+          if instance_variable_get(variable_name_array_symbol).nil?
+            instance_variable_set(variable_name_array_symbol, [])
+          end
+          instance_variable_get(variable_name_array_symbol) << value
+        end
+
+        define_method("#{name}_history".to_sym) do
+          instance_variable_get(variable_name_array_symbol)
+        end
       end
-    
     end
 
     def strong_attr_accessor; end
