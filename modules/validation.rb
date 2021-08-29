@@ -28,7 +28,7 @@ module Validation
 
     def check_format(object)
       unless @options[:format].match?(object.instance_variable_get("@#{@attribute_name}".to_sym))
-        raise "Incorrect format! Should match: #{@options[:format]}"
+        raise "Incorrect format! Should match: #{@options[:format].inspect}"
       end
     end
 
