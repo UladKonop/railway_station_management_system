@@ -1,15 +1,21 @@
 # frozen_string_literal: true
 
 require_relative('./wagon')
+require_relative('../modules/validation')
 
 class CargoWagon < Wagon
   attr_reader :volume, :occupied_volume
+  include Validation
+
+  validate :number, presence: true, format: /^\d+$/
+  validate :volume, presence: true
 
   def initialize(number, volume)
     super(number)
     @type = :cargo
     @volume = volume
     @occupied_volume = 0.0
+    validate!
   end
 
   def free_volume_amount
