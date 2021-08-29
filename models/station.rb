@@ -1,16 +1,17 @@
 # frozen_string_literal: true
 
 require_relative('../modules/instance_counter')
-require_relative('../modules/object_validator')
+require_relative('../modules/validation')
 
 class Station
-  attr_reader :name, :trains
-
   include InstanceCounter
-  extend ObjectValidator
+  include Validation
+  
+  attr_reader :name, :trains
+  validate :name, presence: true
 
   def initialize(name)
-    @name = name.to_s
+    @name = name
     @trains = []
     self.class.all << self
     validate!
@@ -35,11 +36,5 @@ class Station
 
   def trains_by_type(type)
     @trains.select { |train| train.type == type }
-  end
-
-  private
-
-  def validate!
-    raise 'The station name must consist of at least one character' unless @name.size >= 1
   end
 end
