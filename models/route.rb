@@ -1,13 +1,18 @@
 # frozen_string_literal: true
 
 require_relative('../modules/instance_counter')
-require_relative('../modules/object_validator')
+require_relative('../modules/validation')
+require_relative('./station')
 
 class Route
+  include InstanceCounter
+  include Validation
+
   attr_reader :starting_station, :end_station, :intermediate_stations
 
-  include InstanceCounter
-  extend ObjectValidator
+  validate :starting_station, type: Station
+  validate :end_station, type: Station
+
 
   def initialize(starting_station, end_station)
     @starting_station = starting_station
@@ -33,11 +38,5 @@ class Route
     end
     stations << @end_station
     stations
-  end
-
-  private
-
-  def validate!
-    raise 'Stations should not be nil' unless !@starting_station.nil? || !@end_station.nil?
   end
 end
