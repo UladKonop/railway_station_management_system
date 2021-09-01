@@ -3,7 +3,7 @@
 require_relative('./route')
 require_relative('./station')
 require_relative('../modules/manufacturer')
-require_relative '../modules/accessors.rb'
+require_relative('../modules/accessors')
 
 class Train
   include Manufacturer
