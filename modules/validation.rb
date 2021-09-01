@@ -22,11 +22,11 @@ module Validation
       self.class.instance_variable_get(:@options).compact.each_key do |key|
         case key
         when :presence
-          check_presence(self)
+          check_presence
         when :format
-          check_format(self)
+          check_format
         when :type
-          check_type(self)
+          check_type
         end
       end
     end
@@ -42,23 +42,29 @@ module Validation
 
   private
 
-    def check_presence(object)
-      if object.instance_variable_get("@#{@attribute_name.to_s}".to_sym).nil?
-        raise "#{object.class}.#{@attribute_name} shouldn't be nil"
-      elsif object.instance_variable_get("@#{@attribute_name.to_s}".to_sym).empty?
-        raise "#{object.class}.#{@attribute_name} shouldn't be empty"
-      end
-    end
+  def check_presence
+    attribute_name = self.class.instance_variable_get(:@attribute_name)
 
-    def check_format(object)
-      unless @options[:format].match?(object.instance_variable_get("@#{@attribute_name}".to_sym))
-        raise "Incorrect format! Should match: #{@options[:format].inspect}"
-      end
+    if instance_variable_get("@#{attribute_name}".to_sym).nil?
+      raise "#{self.class}.#{attribute_name} shouldn't be nil"
+    elsif instance_variable_get("@#{attribute_name}".to_sym).empty?
+      raise "#{self.class}.#{attribute_name} shouldn't be empty"
     end
+  end
 
-    def check_type(object)
-      unless object.instance_variable_get("@#{@attribute_name}".to_sym).instance_of?(@options[:type])
-        raise "Wrong type! #{object.class}.#{@attribute_name} should be #{@options[:type]}"
-      end
+  def check_format
+    attribute_name = self.class.instance_variable_get(:@attribute_name)
+
+    unless self.class.instance_variable_get(:@options)[:format].match?(instance_variable_get("@#{attribute_name}".to_sym))
+      raise "Incorrect format! Should match: #{self.class.instance_variable_get(:@options)[:format].inspect}"
     end
+  end
+
+  def check_type
+    attribute_name = self.class.instance_variable_get(:@attribute_name)
+
+    unless instance_variable_get("@#{attribute_name}".to_sym).instance_of?(self.class.instance_variable_get(:@options)[:type])
+      raise "Wrong type! #{self.class}.#{attribute_name} should be #{self.class.instance_variable_get(:@options)[:type]}"
+    end
+  end
 end
