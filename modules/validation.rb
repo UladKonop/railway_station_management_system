@@ -15,8 +15,32 @@ module Validation
         type: options[:type] || nil
       }
     end
+  end
 
-    private
+  module InstanceMethods
+    def validate!
+      self.class.instance_variable_get(:@options).compact.each_key do |key|
+        case key
+        when :presence
+          check_presence(self)
+        when :format
+          check_format(self)
+        when :type
+          check_type(self)
+        end
+      end
+    end
+
+    def valid?
+      validate!
+      true
+    rescue StandardError => e
+      p e.message
+      false
+    end
+  end
+
+  private
 
     def check_presence(object)
       if object.instance_variable_get("@#{@attribute_name.to_s}".to_sym).nil?
@@ -37,28 +61,4 @@ module Validation
         raise "Wrong type! #{object.class}.#{@attribute_name} should be #{@options[:type]}"
       end
     end
-  end
-
-  module InstanceMethods
-    def validate!
-      self.class.instance_variable_get(:@options).compact.each_key do |key|
-        case key
-        when :presence
-          self.class.send(:check_presence, self)
-        when :format
-          self.class.send(:check_format, self)
-        when :type
-          self.class.send(:check_type, self)
-        end
-      end
-    end
-
-    def valid?
-      validate!
-      true
-    rescue StandardError => e
-      p e.message
-      false
-    end
-  end
 end
