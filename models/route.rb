@@ -13,7 +13,6 @@ class Route
   validate :starting_station, type: Station
   validate :end_station, type: Station
 
-
   def initialize(starting_station, end_station)
     @starting_station = starting_station
     @end_station = end_station

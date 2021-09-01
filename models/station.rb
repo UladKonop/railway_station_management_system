@@ -6,8 +6,9 @@ require_relative('../modules/validation')
 class Station
   include InstanceCounter
   include Validation
-  
+
   attr_reader :name, :trains
+
   validate :name, presence: true
 
   def initialize(name)

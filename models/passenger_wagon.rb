@@ -5,6 +5,7 @@ require_relative('../modules/validation')
 
 class PassengerWagon < Wagon
   attr_reader :seats_amount, :occupied_seats
+
   include Validation
 
   validate :number, presence: true, format: /^\d+$/
