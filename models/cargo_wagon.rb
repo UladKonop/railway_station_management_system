@@ -9,7 +9,6 @@ class CargoWagon < Wagon
   include Validation
 
   validate :number, presence: true, format: /^\d+$/
-  validate :volume, presence: true
 
   def initialize(number, volume)
     super(number)
