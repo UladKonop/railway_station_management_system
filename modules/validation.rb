@@ -8,25 +8,23 @@ module Validation
 
   module ClassMethods
     def validate(attribute_name, options = {})
-      @attribute_name = attribute_name
-      @options = {
-        presence: options[:presence] || nil,
-        format: options[:format] || nil,
-        type: options[:type] || nil
-      }
+      @validations = []
+      options.each_pair do |key, value|
+        @validations << { variable: attribute_name, validation_type: key, option: value }
+      end
     end
   end
 
   module InstanceMethods
     def validate!
-      self.class.instance_variable_get(:@options).compact.each_key do |key|
-        case key
+      self.class.instance_variable_get(:@validations).each do |validation|
+        case validation[:validation_type]
         when :presence
-          check_presence
+          check_presence(validation[:variable])
         when :format
-          check_format
+          check_format(validation[:variable], validation[:option])
         when :type
-          check_type
+          check_type(validation[:variable], validation[:option])
         end
       end
     end
@@ -42,29 +40,23 @@ module Validation
 
   private
 
-  def check_presence
-    attribute_name = self.class.instance_variable_get(:@attribute_name)
-
-    if instance_variable_get("@#{attribute_name}".to_sym).nil?
-      raise "#{self.class}.#{attribute_name} shouldn't be nil"
-    elsif instance_variable_get("@#{attribute_name}".to_sym).empty?
-      raise "#{self.class}.#{attribute_name} shouldn't be empty"
+  def check_presence(variable)
+    if instance_variable_get("@#{variable}".to_sym).nil?
+      raise "#{self.class}.#{variable} shouldn't be nil"
+    elsif instance_variable_get("@#{variable}".to_sym).empty?
+      raise "#{self.class}.#{variable} shouldn't be empty"
     end
   end
 
-  def check_format
-    attribute_name = self.class.instance_variable_get(:@attribute_name)
-
-    unless self.class.instance_variable_get(:@options)[:format].match?(instance_variable_get("@#{attribute_name}".to_sym))
-      raise "Incorrect format! Should match: #{self.class.instance_variable_get(:@options)[:format].inspect}"
+  def check_format(variable, regex)
+    unless instance_variable_get("@#{variable}".to_sym).match?(regex)
+      raise "Incorrect format! Should match: #{regex.inspect}"
     end
   end
 
-  def check_type
-    attribute_name = self.class.instance_variable_get(:@attribute_name)
-
-    unless instance_variable_get("@#{attribute_name}".to_sym).instance_of?(self.class.instance_variable_get(:@options)[:type])
-      raise "Wrong type! #{self.class}.#{attribute_name} should be #{self.class.instance_variable_get(:@options)[:type]}"
+  def check_type(variable, type)
+    unless instance_variable_get("@#{variable}".to_sym).instance_of?(type)
+      raise "Wrong type! #{self.class}.#{variable} should be #{type}"
     end
   end
 end
