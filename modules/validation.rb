@@ -18,13 +18,14 @@ module Validation
   module InstanceMethods
     def validate!
       self.class.instance_variable_get(:@validations).each do |validation|
+        variable = instance_variable_get("@#{validation[:variable]}".to_sym)
         case validation[:validation_type]
         when :presence
-          check_presence(validation[:variable])
+          check_presence(variable, validation[:variable])
         when :format
-          check_format(validation[:variable], validation[:option])
+          check_format(variable, validation[:option])
         when :type
-          check_type(validation[:variable], validation[:option])
+          check_type(variable, validation[:variable], validation[:option])
         end
       end
     end
@@ -40,23 +41,23 @@ module Validation
 
   private
 
-  def check_presence(variable)
-    if instance_variable_get("@#{variable}".to_sym).nil?
-      raise "#{self.class}.#{variable} shouldn't be nil"
-    elsif instance_variable_get("@#{variable}".to_sym).empty?
-      raise "#{self.class}.#{variable} shouldn't be empty"
+  def check_presence(variable, variable_name)
+    if variable.nil?
+      raise "#{self.class}.#{variable_name} shouldn't be nil"
+    elsif variable.empty?
+      raise "#{self.class}.#{variable_name} shouldn't be empty"
     end
   end
 
   def check_format(variable, regex)
-    unless instance_variable_get("@#{variable}".to_sym).match?(regex)
+    unless variable.match?(regex)
       raise "Incorrect format! Should match: #{regex.inspect}"
     end
   end
 
-  def check_type(variable, type)
-    unless instance_variable_get("@#{variable}".to_sym).instance_of?(type)
-      raise "Wrong type! #{self.class}.#{variable} should be #{type}"
+  def check_type(variable, variable_name, type)
+    unless variable.instance_of?(type)
+      raise "Wrong type! #{self.class}.#{variable_name} should be #{type}"
     end
   end
 end
