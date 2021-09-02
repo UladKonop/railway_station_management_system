@@ -19,14 +19,12 @@ module Validation
     def validate!
       self.class.instance_variable_get(:@validations).each do |validation|
         variable = instance_variable_get("@#{validation[:variable]}".to_sym)
-        case validation[:validation_type]
-        when :presence
-          check_presence(variable, validation[:variable])
-        when :format
-          check_format(variable, validation[:option])
-        when :type
-          check_type(variable, validation[:variable], validation[:option])
-        end
+        send(
+          validation[:validation_type],
+          variable,
+          validation[:variable],
+          validation[:option]
+        )
       end
     end
 
@@ -41,7 +39,7 @@ module Validation
 
   private
 
-  def check_presence(variable, variable_name)
+  def presence(variable, variable_name, _option)
     if variable.nil?
       raise "#{self.class}.#{variable_name} shouldn't be nil"
     elsif variable.empty?
@@ -49,13 +47,11 @@ module Validation
     end
   end
 
-  def check_format(variable, regex)
-    unless variable.match?(regex)
-      raise "Incorrect format! Should match: #{regex.inspect}"
-    end
+  def format(variable, _variable_name, regex)
+    raise "Incorrect format! Should match: #{regex.inspect}" unless variable.match?(regex)
   end
 
-  def check_type(variable, variable_name, type)
+  def type(variable, variable_name, type)
     unless variable.instance_of?(type)
       raise "Wrong type! #{self.class}.#{variable_name} should be #{type}"
     end
