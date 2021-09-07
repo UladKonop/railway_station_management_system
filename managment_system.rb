@@ -40,13 +40,13 @@ class ManagmentSystem
 
   def add_intermediate_stations
     if @route.nil?
-      p 'Create route first'
+      @interface.print_message 'Create route first'
     else
       intermediate_stations = create_stations_menu
       intermediate_stations.each do |intermediate_station|
         if check_station(intermediate_station)
-          p 'Choose another stations!'
-          p 'These stations are already on the route!'
+          @interface.print_message 'Choose another stations!'
+          @interface.print_message 'These stations are already on the route!'
         else
           @route.intermediate_stations = find_station(intermediate_station)
           break
@@ -57,9 +57,9 @@ class ManagmentSystem
 
   def show_route
     if @route.nil?
-      p 'Create route first'
+      @interface.print_message 'Create route first'
     else
-      p @route.stations
+      @interface.print_message @route.stations
     end
   end
 
@@ -72,18 +72,18 @@ class ManagmentSystem
   def create_station
     @stations << Station.new(@prompt.ask('Enter station name:'))
   rescue StandardError => e
-    p e.message
+    @interface.print_message e.message
   end
 
   def new_route(first_station, last_station)
     @route = Route.new(first_station, last_station)
   rescue StandardError => e
-    p e.message
+    @interface.print_message e.message
   end
 
   def create_route
     if @stations.empty? || @stations.size == 1
-      p 'Create at least TWO stations first'
+      @interface.print_message 'Create at least TWO stations first'
     else
       start_end_stations = []
       loop do
@@ -92,7 +92,7 @@ class ManagmentSystem
         if start_end_stations.size == 2
           break
         else
-          p 'Choose TWO stations'
+          @interface.print_message 'Choose TWO stations'
         end
       end
       new_route(find_station(start_end_stations.first), find_station(start_end_stations.last))
@@ -106,14 +106,14 @@ class ManagmentSystem
   def create_cargo_train
     @trains << CargoTrain.new(@prompt.ask('Please, enter train number: '))
   rescue StandardError => e
-    p e.message
+    @interface.print_message e.message
     retry
   end
 
   def create_passenger_train
     @trains << PassengerTrain.new(@prompt.ask('Please, enter train number: '))
   rescue StandardError => e
-    p e.message
+    @interface.print_message e.message
     retry
   end
 
@@ -136,9 +136,9 @@ class ManagmentSystem
 
   def assign_route
     if @route.nil?
-      p 'Create route first'
+      @interface.print_message 'Create route first'
     elsif @trains.empty?
-      p 'Create at least one train first'
+      @interface.print_message 'Create at least one train first'
     else
       find_train(select_train_number).route = @route
     end
@@ -156,7 +156,7 @@ class ManagmentSystem
 
   def move_train
     if @trains.empty?
-      p 'Create at least one train first'
+      @interface.print_message 'Create at least one train first'
     else
       train_number = select_train_number
       train = find_train(train_number)
@@ -180,7 +180,7 @@ class ManagmentSystem
     begin
       train.add_wagon(CargoWagon.new(wagon_number, volume))
     rescue StandardError => e
-      p e.message
+      @interface.print_message e.message
     end
   end
 
@@ -189,18 +189,18 @@ class ManagmentSystem
     begin
       train.add_wagon(PassengerWagon.new(wagon_number, seats_amount))
     rescue StandardError => e
-      p e.message
+      @interface.print_message e.message
     end
   end
 
   def add_remove_wagons
     if @trains.empty?
-      p 'Create at least one train first'
+      @interface.print_message 'Create at least one train first'
     else
       train_number = select_train_number
       train = find_train(train_number)
       if train.speed.positive?
-        p 'Stop the train first!'
+        @interface.print_message 'Stop the train first!'
       else
         wagon_number = @prompt.ask('Enter wagon number: ')
 
@@ -234,7 +234,7 @@ class ManagmentSystem
       train_number = select_train_number
       train = find_train(train_number)
       if  train.wagons.empty?
-        p 'Add wagons to train first!'
+        @interface.print_message 'Add wagons to train first!'
       else
         wagon_number = @prompt.select('Select wagon: ', create_wagons_menu(train_number))
         find_wagon(train, wagon_number).manufacturer = enter_manufacturer
@@ -249,12 +249,12 @@ class ManagmentSystem
 
   def occupy
     if @trains.empty?
-      p 'Create at least one train first'
+      @interface.print_message 'Create at least one train first'
     else
       train_number = select_train_number
       train = find_train(train_number)
       if  train.wagons.empty?
-        p 'Add wagons to train first!'
+        @interface.print_message 'Add wagons to train first!'
       else
         wagon_number = @prompt.select('Select wagon: ', create_wagons_menu(train_number))
         case train.type
@@ -271,7 +271,7 @@ class ManagmentSystem
     station_name = @prompt.select('Select station: ', create_stations_menu)
     station = find_station(station_name)
     station.return_trains_for_print do |train|
-      p "Train number: #{train.number}, train type: #{train.type}, wagons amount: #{train.wagons.size}"
+      @interface.print_message "Train number: #{train.number}, train type: #{train.type}, wagons amount: #{train.wagons.size}"
     end
   end
 
@@ -297,7 +297,7 @@ class ManagmentSystem
         create_station
       when 2
         create_train
-        p @trains
+        @interface.print_message @trains
       when 3
         create_route
       when 4

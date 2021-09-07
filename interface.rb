@@ -24,8 +24,13 @@ class Interface
       menu.choice 'Exit', 13
     end
   end
-
+  
   def exit?
     @prompt.yes?('Do you really want to exit?')
   end
+
+  def print_message(text)
+    p text.to_s
+  end
+
 end
