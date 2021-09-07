@@ -100,7 +100,7 @@ class ManagmentSystem
   end
 
   def choose_train_type
-    @prompt.select('Choose train type: ', %w[cargo passenger])
+    @interface.select('Choose train type: ', %w[cargo passenger])
   end
 
   def create_cargo_train
@@ -127,7 +127,7 @@ class ManagmentSystem
   end
 
   def select_train_number
-    @prompt.select('Select train: ', create_trains_menu)
+    @interface.select('Select train: ', create_trains_menu)
   end
 
   def find_train(train_number)
@@ -146,7 +146,7 @@ class ManagmentSystem
 
   def move(train)
     directions = %w[forward backwards]
-    case @prompt.select('Choose direction: ', directions)
+    case @interface.select('Choose direction: ', directions)
     when 'forward'
       train.move(:forward)
     when 'backwards'
@@ -160,7 +160,7 @@ class ManagmentSystem
     else
       train_number = select_train_number
       train = find_train(train_number)
-      case @prompt.select('Select option: ', ['change speed', 'stop', 'move'])
+      case @interface.select('Select option: ', ['change speed', 'stop', 'move'])
       when 'change speed'
         train.speed = @prompt.ask('Enter speed > 0:').to_i
       when 'stop'
@@ -204,7 +204,7 @@ class ManagmentSystem
       else
         wagon_number = @prompt.ask('Enter wagon number: ')
 
-        case @prompt.select('Select option: ', ['add wagon', 'delete wagon'])
+        case @interface.select('Select option: ', ['add wagon', 'delete wagon'])
         when 'add wagon'
           if train.type == :cargo
             add_cargo_wagon(train, wagon_number)
@@ -229,14 +229,14 @@ class ManagmentSystem
   end
 
   def add_manufacturer
-    case @prompt.select('Choose wagons or trains: ', %w[wagons trains])
+    case @interface.select('Choose wagons or trains: ', %w[wagons trains])
     when 'wagons'
       train_number = select_train_number
       train = find_train(train_number)
       if  train.wagons.empty?
         @interface.print_message 'Add wagons to train first!'
       else
-        wagon_number = @prompt.select('Select wagon: ', create_wagons_menu(train_number))
+        wagon_number = @interface.select('Select wagon: ', create_wagons_menu(train_number))
         find_wagon(train, wagon_number).manufacturer = enter_manufacturer
       end
     when 'trains'
@@ -256,7 +256,7 @@ class ManagmentSystem
       if  train.wagons.empty?
         @interface.print_message 'Add wagons to train first!'
       else
-        wagon_number = @prompt.select('Select wagon: ', create_wagons_menu(train_number))
+        wagon_number = @interface.select('Select wagon: ', create_wagons_menu(train_number))
         case train.type
         when :cargo
           find_wagon(train, wagon_number).occupy_volume(@prompt.ask('Enter volume: ').to_f)
@@ -268,7 +268,7 @@ class ManagmentSystem
   end
 
   def print_trains_on_station
-    station_name = @prompt.select('Select station: ', create_stations_menu)
+    station_name = @interface.select('Select station: ', create_stations_menu)
     station = find_station(station_name)
     station.return_trains_for_print do |train|
       @interface.print_message "Train number: #{train.number}, train type: #{train.type}, wagons amount: #{train.wagons.size}"

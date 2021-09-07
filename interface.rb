@@ -33,4 +33,8 @@ class Interface
     p text.to_s
   end
 
+  def select(message, choices_array)
+    @prompt.select(message, choices_array)
+  end
+
 end
