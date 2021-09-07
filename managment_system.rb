@@ -70,7 +70,7 @@ class ManagmentSystem
   end
 
   def create_station
-    @stations << Station.new(@prompt.ask('Enter station name:'))
+    @stations << Station.new(@interface.ask('Enter station name:'))
   rescue StandardError => e
     @interface.print_message e.message
   end
@@ -87,7 +87,7 @@ class ManagmentSystem
     else
       start_end_stations = []
       loop do
-        start_end_stations = @prompt.multi_select('Select the start and end station: ',
+        start_end_stations = @interface.multi_select('Select the start and end station: ',
                                                   create_stations_menu)
         if start_end_stations.size == 2
           break
@@ -104,14 +104,14 @@ class ManagmentSystem
   end
 
   def create_cargo_train
-    @trains << CargoTrain.new(@prompt.ask('Please, enter train number: '))
+    @trains << CargoTrain.new(@interface.ask('Please, enter train number: '))
   rescue StandardError => e
     @interface.print_message e.message
     retry
   end
 
   def create_passenger_train
-    @trains << PassengerTrain.new(@prompt.ask('Please, enter train number: '))
+    @trains << PassengerTrain.new(@interface.ask('Please, enter train number: '))
   rescue StandardError => e
     @interface.print_message e.message
     retry
@@ -162,7 +162,7 @@ class ManagmentSystem
       train = find_train(train_number)
       case @interface.select('Select option: ', ['change speed', 'stop', 'move'])
       when 'change speed'
-        train.speed = @prompt.ask('Enter speed > 0:').to_i
+        train.speed = @interface.ask('Enter speed > 0:').to_i
       when 'stop'
         train.stop
       when 'move'
@@ -176,7 +176,7 @@ class ManagmentSystem
   end
 
   def add_cargo_wagon(train, wagon_number)
-    volume = @prompt.ask('Enter amount of wagon volume: ').to_f
+    volume = @interface.ask('Enter amount of wagon volume: ').to_f
     begin
       train.add_wagon(CargoWagon.new(wagon_number, volume))
     rescue StandardError => e
@@ -185,7 +185,7 @@ class ManagmentSystem
   end
 
   def add_passenger_wagon(train, wagon_number)
-    seats_amount = @prompt.ask('Enter amount of wagon seats: ')
+    seats_amount = @interface.ask('Enter amount of wagon seats: ')
     begin
       train.add_wagon(PassengerWagon.new(wagon_number, seats_amount))
     rescue StandardError => e
@@ -202,11 +202,10 @@ class ManagmentSystem
       if train.speed.positive?
         @interface.print_message 'Stop the train first!'
       else
-        wagon_number = @prompt.ask('Enter wagon number: ')
-
+        wagon_number = @interface.ask('Enter wagon number: ')
         case @interface.select('Select option: ', ['add wagon', 'delete wagon'])
         when 'add wagon'
-          if train.type == :cargo
+          if train.instance_variable_get(:@type) == :cargo
             add_cargo_wagon(train, wagon_number)
           else
             add_passenger_wagon(train, wagon_number)
@@ -225,7 +224,7 @@ class ManagmentSystem
   end
 
   def enter_manufacturer
-    @prompt.ask('Enter manufacturer: ')
+    @interface.ask('Enter manufacturer: ')
   end
 
   def add_manufacturer
@@ -257,9 +256,9 @@ class ManagmentSystem
         @interface.print_message 'Add wagons to train first!'
       else
         wagon_number = @interface.select('Select wagon: ', create_wagons_menu(train_number))
-        case train.type
+        case train.instance_variable_get(:@type)
         when :cargo
-          find_wagon(train, wagon_number).occupy_volume(@prompt.ask('Enter volume: ').to_f)
+          find_wagon(train, wagon_number).occupy_volume(@interface.ask('Enter volume: ').to_f)
         when :passenger
           find_wagon(train, wagon_number).occupy_seat
         end
@@ -271,21 +270,21 @@ class ManagmentSystem
     station_name = @interface.select('Select station: ', create_stations_menu)
     station = find_station(station_name)
     station.return_trains_for_print do |train|
-      @interface.print_message "Train number: #{train.number}, train type: #{train.type}, wagons amount: #{train.wagons.size}"
+      @interface.print_message "Train number: #{train.number}, train type: #{train.instance_variable_get(:@type)}, wagons amount: #{train.wagons.size}"
     end
   end
 
   def print_train_wagons
     train_number = select_train_number
     train = find_train(train_number)
-
-    if train.type == :cargo
+    type = train.instance_variable_get(:@type)
+    if type == :cargo
       train.return_wagons_for_print do |wagon|
-        p "Wagon number: #{wagon.number}, wagon type: #{train.type}, free volume amount: #{wagon.free_volume_amount}, occupied volume amount: #{wagon.occupied_volume}"
+        p "Wagon number: #{wagon.number}, wagon type: #{type}, free volume amount: #{wagon.free_volume_amount}, occupied volume amount: #{wagon.occupied_volume}"
       end
     else
       train.return_wagons_for_print do |wagon|
-        p "Wagon number: #{wagon.number}, wagon type: #{train.type}, free seats amount: #{wagon.free_seats_amount}, occupied volume amount: #{wagon.occupied_seats}"
+        p "Wagon number: #{wagon.number}, wagon type: #{type}, free seats amount: #{wagon.free_seats_amount}, occupied volume amount: #{wagon.occupied_seats}"
       end
     end
   end

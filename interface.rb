@@ -37,4 +37,12 @@ class Interface
     @prompt.select(message, choices_array)
   end
 
+  def ask(message)
+    @prompt.ask(message)
+  end
+
+  def multi_select(message, choices_array)
+    @prompt.multi_select(message, choices_array)
+  end
+
 end
