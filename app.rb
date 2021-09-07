@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
-require_relative('interface')
+require_relative('managment_system')
 
-Interface.new.start if __FILE__ == $PROGRAM_NAME
+ManagmentSystem.new.start if __FILE__ == $PROGRAM_NAME
