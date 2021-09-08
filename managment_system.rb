@@ -28,8 +28,8 @@ class ManagmentSystem
 
   def check_station(station)
     @route.starting_station == find_station(station) ||
-      @route.end_station == find_station(station) ||
-      @route.intermediate_stations.include?(find_station(station))
+    @route.end_station == find_station(station) ||
+    @route.intermediate_stations.include?(find_station(station))
   end
 
   def create_stations_menu
@@ -42,11 +42,10 @@ class ManagmentSystem
     if @route.nil?
       @interface.print_message 'Create route first'
     else
-      intermediate_stations = create_stations_menu
-      intermediate_stations.each do |intermediate_station|
+      @interface.multi_select('Choose intermediate stations: ', create_stations_menu).each do |intermediate_station|
         if check_station(intermediate_station)
-          @interface.print_message 'Choose another stations!'
-          @interface.print_message 'These stations are already on the route!'
+          @interface.print_message 'Choose another station!'
+          @interface.print_message "This station: #{intermediate_station} - are already on the route!"
         else
           @route.intermediate_stations = find_station(intermediate_station)
           break
@@ -296,7 +295,6 @@ class ManagmentSystem
         create_station
       when 2
         create_train
-        @interface.print_message @trains
       when 3
         create_route
       when 4
