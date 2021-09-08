@@ -117,12 +117,7 @@ class ManagmentSystem
   end
 
   def create_train
-    case choose_train_type
-    when 'cargo'
-      create_cargo_train
-    when 'passenger'
-      create_passenger_train
-    end
+    choose_train_type == 'cargo' ? create_cargo_train : create_passenger_train
   end
 
   def select_train_number
@@ -144,13 +139,7 @@ class ManagmentSystem
   end
 
   def move(train)
-    directions = %w[forward backwards]
-    case @interface.select('Choose direction: ', directions)
-    when 'forward'
-      train.move(:forward)
-    when 'backwards'
-      train.move(:backwards)
-    end
+    train.move(@interface.select('Choose direction: ', %w[forward backwards]))
   end
 
   def move_train
@@ -184,7 +173,7 @@ class ManagmentSystem
   end
 
   def add_passenger_wagon(train, wagon_number)
-    seats_amount = @interface.ask('Enter amount of wagon seats: ')
+    seats_amount = @interface.ask('Enter amount of wagon seats: ').to_i
     begin
       train.add_wagon(PassengerWagon.new(wagon_number, seats_amount))
     rescue StandardError => e
@@ -222,16 +211,12 @@ class ManagmentSystem
     wagons_numbers
   end
 
-  def enter_manufacturer
-    @interface.ask('Enter manufacturer: ')
-  end
-
   def add_manufacturer
     case @interface.select('Choose wagons or trains: ', %w[wagons trains])
     when 'wagons'
       train_number = select_train_number
       train = find_train(train_number)
-      if  train.wagons.empty?
+      if train.wagons.empty?
         @interface.print_message 'Add wagons to train first!'
       else
         wagon_number = @interface.select('Select wagon: ', create_wagons_menu(train_number))
@@ -240,9 +225,8 @@ class ManagmentSystem
     when 'trains'
       train_number = select_train_number
       train = find_train(train_number)
-      train.manufacturer = enter_manufacturer
+      train.manufacturer = @interface.ask('Enter manufacturer: ')
     end
-    p train
   end
 
   def occupy

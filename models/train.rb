@@ -78,9 +78,9 @@ class Train
 
   def move(direction)
     case direction
-    when :forward
+    when 'forward'
       next_station ? move_train_forward : 'The train is already at the final station!'
-    when :backwards
+    when 'backwards'
       previous_station ? move_train_backwards : 'The train is already at the first station!'
     end
   end
